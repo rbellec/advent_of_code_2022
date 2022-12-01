@@ -19,6 +19,6 @@ module Aoc2022
     # config.time_zone = "Central Time (US & Canada)"
     # config.eager_load_paths << Rails.root.join("extras")
 
-    config.eager_load_paths << Rails.root.join("app/daily_problems")
+    config.autoload_paths += %W[#{config.root}/app/daily_problems]
   end
 end
