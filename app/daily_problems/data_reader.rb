@@ -18,6 +18,6 @@ class DataReader
   end
 
   def read_file
-     File.readlines(file_path)
+     File.readlines(file_path, chomp: true)
   end
 end
