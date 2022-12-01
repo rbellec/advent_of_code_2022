@@ -29,13 +29,29 @@ class Day01
   def self.problem_1
     # Solution: Elve 79 is carrying 69836 calories
     reader = DataReader.new(day: 1, problem: 1)
-    new.call(reader.content)
+    new.problem_1(reader.content)
   end
 
-  def call(data)
+  def self.problem_2(test_data: true)
+    data = test_data ? ELVES_CALORIES_SAMPLE : DataReader.new(day: 1, problem: 1).content
+    new.problem_2(data)
+  end
+
+  def problem_1(data)
     # Find the elve carrying the most calories
     elve, calories = calory_per_elve(data).max_by { |_elve, calories| calories }
     puts "Elve #{elve} is carrying #{calories} calories"
+  end
+
+  def problem_2(data)
+    # Top 3 elves carry 207968 calories.
+    top_3_elves = sorted_elves_calories_assoc(data).first(3)
+    tota_calories = top_3_elves.map(&:last).sum
+  end
+
+  # [[elve, calories], ...] sorted by calories amount
+  def sorted_elves_calories_assoc(data)
+    calory_per_elve(data).sort_by{|_elve, calories| calories }.reverse
   end
 
   def calory_per_elve(data)
