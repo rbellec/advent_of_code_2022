@@ -20,7 +20,6 @@ class Day01
   # Note : since puzzle input differ by user, I have to save it on disk from browser and can't just
   # read it online.
   # PROBLEM_1_DATA_URL = "https://adventofcode.com/2022/day/1/input"
-  PROBLEM_1_DATA_URL = "https://adventofcode.com/2022/day/1/input"
 
   def self.test_with_sample
     new.call(ELVES_CALORIES_SAMPLE)
