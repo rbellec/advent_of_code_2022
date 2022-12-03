@@ -1,5 +1,15 @@
 class Day03
 
+  TEST_DATA = %w(
+    vJrwpWtwJgWrhcsFMMfFFhFp
+    jqHRNqRjqzjGDLGLrsFMfFZSrLrFZsSL
+    PmmdzqPrVvPwwTWBwg
+
+    wMqvLMZHhHMvwLHjbvcjnnSBnvTQFn
+    ttgJtRGJQctTZtZT
+    CrZsJsPPZsGzwwsLwLmpwMDw
+  )
+
   def self.call
     new.problem_2
   end
@@ -7,6 +17,7 @@ class Day03
   attr_reader :lines
 
   def initialize
+    # @lines = TEST_DATA
     @lines = DataReader.new(day: 3, problem: 1).content
   end
 
@@ -20,11 +31,11 @@ class Day03
     # Could continue with duplicate detection, but I like sets
     bags = lines.map{|l| Rucksack.new(l)}
     badges = bags
-    .map(&:item_set)
-    .each_slice(3)
-    .map{ |bag1, bag2, bag3| (bag1 - bag2 - bag3).first } # badge for each group of 3
-    .map(&method(:priority_for))
-    .sum
+      .map(&:item_set)
+      .each_slice(3)
+      .map{ |bag1, bag2, bag3| (bag1 & bag2 & bag3).first } # badge for each group of 3
+      .map(&method(:priority_for))
+      .sum
   end
 
   def priority_for(letter)
