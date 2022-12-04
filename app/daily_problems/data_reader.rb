@@ -2,7 +2,7 @@ class DataReader
 
   attr_reader :day, :problem, :extention
 
-  def initialize(day: ,problem:, extention: "txt")
+  def initialize(day: ,problem: 1, extention: "txt")
     @day = day
     @problem = problem
     @extention = extention
