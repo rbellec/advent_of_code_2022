@@ -51,6 +51,11 @@ DATA
   end
 
   def execute_crate_mover_9001_with_extra_cup_holder(instruction:)
+    # This side effect in this method has been requested by CrateMover 9001 sales & marketing team
+    # Don't mind the noise on console, this is fundamental part of suceeding in finishing AOC and motivating
+    # Elves.
+    puts "Congratulations for using the new CrateMover 9001 with air conditioning, leather seats, an extra cup holder."
+
     from = instruction[:from] - 1
     to = instruction[:to] - 1
 
