@@ -26,8 +26,9 @@ class Day07
   DATA
 
   class DFileItem
+    include Enumerable
     attr_reader :parent, :name, :type, :size, :content
-
+    attr_writer :parent
     def initialize(parent:, name:, type:, size: 0, content: nil)
       @parent = parent
       @name = name
@@ -37,6 +38,27 @@ class Day07
     end
 
     def subdir_size = 0
+
+    def full_path
+      name == "/" ? Pathname("/") : parent.full_path.join(name)
+    end
+
+    def each(&block)
+      yield self
+      if type == :directory
+        content.each { |elem| elem.each(&block) }
+      end
+    end
+
+    def print_tree(path = "/", level = 0)
+      current_path = Pathname(path).join(name)
+      string_path = "  " * level + current_path.to_s
+      if type == :directory
+        [string_path, *content.map { |f| f.print_tree(current_path, level + 1) }].flatten
+      else
+        string_path
+      end
+    end
   end
 
   class DFile < DFileItem
@@ -47,47 +69,34 @@ class Day07
     def total_size
       size
     end
-
-    def print_tree(path, level)
-      path + "/" + name
-    end
   end
 
   class DDirectory < DFileItem
-    attr_writer :parent
-
     def initialize(parent:, name:)
-      super(parent:, name:, size: 0, type: :directory, content: [])
+      super(parent: parent, name: name, size: 0, type: :directory, content: [])
     end
 
-    def add_file(file) = content << file
-
-    def content_size
-      # Dir have a 0 size to avoid filter here
-      content.sum(&:size)
+    def add_file(filename, size)
+      new_file = DFile.new(parent: self, name: filename, size: size)
+      content << new_file
+      new_file
     end
 
-    def subdir_size
-      content.sum(&:subdir_size)
+    def add_dir(subdir_name)
+      return if subdir_name == "/"
+      new_dir = DDirectory.new(parent: self, name: subdir_name)
+      content << new_dir
+      new_dir
     end
 
     def total_size
-      content_size + subdir_size
+      @total_size ||= content.sum(&:total_size)
     end
 
     def self.new_root
       root = new(parent: nil, name: "/")
       root.parent = root
       root
-    end
-
-    def print_tree(path, level = 0)
-      if level == 0
-        ["/"] + content.map { |f| f.print_tree("", level + 1) }
-      else
-        current_path = path + "/" + name
-        [current_path] + content.map { |f| f.print_tree(current_path, level + 1) }
-      end
     end
   end
 
@@ -99,15 +108,18 @@ class Day07
 
     @data_stream = StringIO.new(TEST_DATA)
     # data_stream = @stream = File.new(DataReader.new(day: 7).file_path)
+    read_data
   end
 
   def self.call
-    solver = new
-    solver.read_data
-    solver.root.print_tree("", 0)
+    # new.root.print_tree
+
+    Day07.new.problem_1
   end
 
   def problem_1
+    directories = root.filter { |f| f.type == :directory }
+    directories.map { |d| [d.name, d.total_size] }
   end
 
   def problem_2
@@ -115,16 +127,18 @@ class Day07
 
   def get_create_dir(name)
     directory = current_dir.content.find { |d| d.name == name } # && d.type == :directory ?
-    if directory.nil?
-      directory = DDirectory.new(parent: current_dir, name: name)
-      current_dir.add_file(directory)
-    end
-    directory
+    directory.nil? ? current_dir.add_dir(name) : directory
+  end
+
+  def show
+    root.map(&:name).join(", ")
   end
 
   def read_data
     data_stream.readlines.each do |line|
-      case line.chomp
+      line.chomp!
+
+      case line
       when "$ cd /"
         @current_dir = root
       when "$ cd .."
@@ -137,10 +151,11 @@ class Day07
       when /dir ([\w\-.]+)/
         get_create_dir($1)
       when /(\d+)\s+([\w\-.]+)/
-        current_dir.add_file(DFile.new(parent: current_dir, name: $2, size: $1.to_i))
+        current_dir.add_file($2, $1.to_i)
       else
         puts "Urecognized line:" + line
       end
     end
+    self
   end
 end
