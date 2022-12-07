@@ -106,23 +106,30 @@ class Day07
     @root = DDirectory.new_root
     @current_dir = @root
 
-    @data_stream = StringIO.new(TEST_DATA)
-    # data_stream = @stream = File.new(DataReader.new(day: 7).file_path)
+    # @data_stream = StringIO.new(TEST_DATA)
+    @data_stream = File.new(DataReader.new(day: 7).file_path)
     read_data
   end
 
   def self.call
     # new.root.print_tree
 
-    Day07.new.problem_1
+    Day07.new.problem_2
   end
 
+  def directories = root.filter { |f| f.type == :directory };
+
   def problem_1
-    directories = root.filter { |f| f.type == :directory }
-    directories.map { |d| [d.name, d.total_size] }
+    small_dirs = directories.filter { |d| d.total_size <= 100000 }
+    small_dirs.sum(&:total_size)
   end
 
   def problem_2
+    total_space = 70000000
+    needed = 30000000
+    to_free = needed - (total_space - root.total_size)
+    to_delete = directories.filter {|d| d.total_size >= to_free }.min_by(&:total_size)
+    [to_delete.name, to_delete.total_size]
   end
 
   def get_create_dir(name)
