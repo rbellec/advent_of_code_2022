@@ -1,5 +1,4 @@
 class Day01
-
   ELVES_CALORIES_SAMPLE = [
     "1000",
     "2000",
@@ -14,7 +13,7 @@ class Day01
     "8000",
     "9000",
     "",
-    "1000",
+    "1000"
   ]
 
   # Note : since puzzle input differ by user, I have to save it on disk from browser and can't just
@@ -50,19 +49,19 @@ class Day01
 
   # [[elve, calories], ...] sorted by calories amount
   def sorted_elves_calories_assoc(data)
-    calory_per_elve(data).sort_by{|_elve, calories| calories }.reverse
+    calory_per_elve(data).sort_by { |_elve, calories| calories }.reverse
   end
 
   def calory_per_elve(data)
-    inventory_per_elve(data).transform_values{|inventory| inventory.sum}
+    inventory_per_elve(data).transform_values { |inventory| inventory.sum }
   end
 
   def inventory_per_elve(data)
     # Group calories by elves
-    data.chunk{|l| !l.blank?}
-    .filter{|g| g.first} # supress empty lines
-    .each_with_index.map{|chunk, elve_index| [elve_index, chunk.last.map(&:to_i)]}
-    .to_h
+    data.chunk { |l| !l.blank? }
+      .filter { |g| g.first } # supress empty lines
+      .each_with_index.map { |chunk, elve_index| [elve_index, chunk.last.map(&:to_i)] }
+      .to_h
   end
 
   attr_reader :data

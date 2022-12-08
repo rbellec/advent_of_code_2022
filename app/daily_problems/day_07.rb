@@ -117,7 +117,7 @@ class Day07
     Day07.new.problem_2
   end
 
-  def directories = root.filter { |f| f.type == :directory };
+  def directories = root.filter { |f| f.type == :directory }
 
   def problem_1
     small_dirs = directories.filter { |d| d.total_size <= 100000 }
@@ -128,7 +128,7 @@ class Day07
     total_space = 70000000
     needed = 30000000
     to_free = needed - (total_space - root.total_size)
-    to_delete = directories.filter {|d| d.total_size >= to_free }.min_by(&:total_size)
+    to_delete = directories.filter { |d| d.total_size >= to_free }.min_by(&:total_size)
     [to_delete.name, to_delete.total_size]
   end
 

@@ -1,19 +1,18 @@
 class Day05
-
-TEST_DATA = <<-DATA
-    [D]
-[N] [C]
-[Z] [M] [P]
- 1   2   3
-
-move 1 from 2 to 1
-move 3 from 1 to 3
-move 2 from 2 to 1
-move 1 from 1 to 2
-DATA
+  TEST_DATA = <<~DATA
+        [D]
+    [N] [C]
+    [Z] [M] [P]
+     1   2   3
+    
+    move 1 from 2 to 1
+    move 3 from 1 to 3
+    move 2 from 2 to 1
+    move 1 from 1 to 2
+  DATA
 
   def self.call
-    d=new
+    d = new
     d.print_stacks
     puts ("--- " * d.stacks.size) + "\n\n"
     puts "top crates: " + d.problem_2
@@ -31,13 +30,13 @@ DATA
   end
 
   def problem_1
-    @instructions.each{|i| execute_crate_mover_9000(instruction: i)}
-    @stacks.map(&:first).join('')
+    @instructions.each { |i| execute_crate_mover_9000(instruction: i) }
+    @stacks.map(&:first).join("")
   end
 
   def problem_2
-    @instructions.each{|i| execute_crate_mover_9001_with_extra_cup_holder(instruction: i)}
-    @stacks.map(&:first).join('')
+    @instructions.each { |i| execute_crate_mover_9001_with_extra_cup_holder(instruction: i) }
+    @stacks.map(&:first).join("")
   end
 
   def execute_crate_mover_9000(instruction:)
@@ -64,16 +63,16 @@ DATA
   end
 
   def read_input(lines)
-    stacks_lines, separator, instructions_lines = lines.chunk{|line| !line.empty?}.map(&:last)
+    stacks_lines, separator, instructions_lines = lines.chunk { |line| !line.empty? }.map(&:last)
     @stacks = read_stacks(stacks_lines)
     @instructions = read_instructions(instructions_lines)
   end
 
   def read_stacks(lines)
     # Keep line with stack names
-    content = lines.map{|l| l.scan(/.(.). ?/).flatten}
+    content = lines.map { |l| l.scan(/.(.). ?/).flatten }
     stack_numbers = content.map(&:size).max
-    stacks = stack_numbers.times.map{[]}
+    stacks = stack_numbers.times.map { [] }
 
     # Keep stack numbers somewhere in cas pb 2 mixes them
     @stack_names = content.pop
@@ -109,7 +108,7 @@ DATA
       end.join(" ")
     end.reverse
 
-    lines.each{|line| puts line}
+    lines.each { |line| puts line }
     lines
   end
 end

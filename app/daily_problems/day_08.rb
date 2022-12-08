@@ -1,5 +1,5 @@
 class Day08
-  TEST_DATA =<<~DATA
+  TEST_DATA = <<~DATA
     30373
     25512
     65332
@@ -16,7 +16,7 @@ class Day08
   def transpose(matrix)
     colums_count = matrix.first.size
     # transposed trees matrix
-    (0...colums_count).map{|col_index| matrix.map{|row| row[col_index]}}
+    (0...colums_count).map { |col_index| matrix.map { |row| row[col_index] } }
   end
 
   def self.call
@@ -29,7 +29,7 @@ class Day08
       visible_trees(tree_sequence.reverse).reverse
     else
       tree_sequence.inject([]) do |visible_trees, current_tree|
-        visible_trees.append((visible_trees.empty? || current_tree > visible_trees.compact.last) ? current_tree : nil)
+        visible_trees.append(visible_trees.empty? || current_tree > visible_trees.compact.last ? current_tree : nil)
       end
     end
   end
@@ -42,13 +42,11 @@ class Day08
     end
   end
 
-
-
   # run the block for all line and colums in both direction
   # Finally not used !
   def run_from_all_edges(&block)
-    result = tree_rows.flat_map{ |row| [yield(row), yield(row.reverse)]}
-    result += tree_columns.flat_map{ |column| [yield(column), yield(column.reverse)]}
+    result = tree_rows.flat_map { |row| [yield(row), yield(row.reverse)] }
+    result += tree_columns.flat_map { |column| [yield(column), yield(column.reverse)] }
     result
   end
 
@@ -63,10 +61,10 @@ class Day08
 
   def all_visible_trees
     return @all_visible_trees if @all_visible_trees
-    visible_from_w = tree_rows.map{ visible_trees(_1) }
-    visible_from_e = tree_rows.map{ visible_trees(_1, :reverse) }
-    visible_from_n = tree_columns.map{ visible_trees(_1) }
-    visible_from_s = tree_columns.map{ visible_trees(_1, :reverse) }
+    visible_from_w = tree_rows.map { visible_trees(_1) }
+    visible_from_e = tree_rows.map { visible_trees(_1, :reverse) }
+    visible_from_n = tree_columns.map { visible_trees(_1) }
+    visible_from_s = tree_columns.map { visible_trees(_1, :reverse) }
 
     lines = merge_visibility(visible_from_e, visible_from_w)
     cols = merge_visibility(visible_from_n, visible_from_s)
@@ -75,13 +73,13 @@ class Day08
 
   def print_trees(matrix)
     colsep = ""
-    string = matrix.map{|row| row.map{|tree| (tree || ".").to_s}.join(colsep)}.join("\n")
+    string = matrix.map { |row| row.map { |tree| (tree || ".").to_s }.join(colsep) }.join("\n")
     puts string
   end
 
   def read(stream)
     stream.readlines.map do |line|
-      line.chomp!.split('').map(&:to_i)
+      line.chomp!.split("").map(&:to_i)
     end
   end
 
