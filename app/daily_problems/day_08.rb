@@ -20,7 +20,7 @@ class Day08
   end
 
   def self.call
-    new.problem_1
+    new.problem_2
   end
 
   # For a sequence of int, return the sequence replacing invisible trees by nil.
@@ -34,12 +34,41 @@ class Day08
     end
   end
 
-  def merge_visibility(matrix1, matrix2)
-    matrix1.zip(matrix2).map do |row_a, row_b|
-      row_a.zip(row_b).map do |elem_a, elem_b|
-        elem_a || elem_b
+  # For a sequence of int, return the sequence replacing invisible trees by nil.
+  def scenic_scores(sequence)
+    size = sequence.size
+    sequence.each_with_index.map do |tree, index|
+      before = sequence.slice(0, index).reverse
+      after = sequence.slice(index + 1, size - index)
+      before_trees = visible_trees_from(tree, before)
+      after_trees = visible_trees_from(tree, after)
+      before_trees * after_trees
+    end
+  end
+
+  def visible_trees_from(tree, line_of_sight)
+    if line_of_sight.empty?
+      0
+    else
+      blocking_tree_index = line_of_sight.find_index { |i| i >= tree }
+      if blocking_tree_index.nil?
+        line_of_sight.size
+      else
+        blocking_tree_index + 1
       end
     end
+  end
+
+  def merge_matrix(matrix1, matrix2)
+    matrix1.zip(matrix2).map do |row_a, row_b|
+      row_a.zip(row_b).map do |elem_a, elem_b|
+        yield(elem_a, elem_b)
+      end
+    end
+  end
+
+  def merge_visibility(matrix1, matrix2)
+    merge_matrix(matrix1, matrix2) { |a, b| a || b }
   end
 
   # run the block for all line and colums in both direction
@@ -51,6 +80,11 @@ class Day08
   end
 
   def problem_2
+    row_scores = tree_rows.map(&method(:scenic_scores))
+    col_scores = tree_columns.map(&method(:scenic_scores))
+    result = merge_matrix(row_scores, transpose(col_scores)) { |a, b| a * b }
+    print_trees(result)
+    result.flatten.max
   end
 
   def problem_1
@@ -79,10 +113,9 @@ class Day08
 
   def read(stream)
     stream.readlines.map do |line|
-      line.chomp!.split("").map(&:to_i)
+      line.chomp!.chars.map(&:to_i)
     end
   end
 
-  attr_accessor :trees
   attr_reader :tree_rows, :tree_columns
 end
