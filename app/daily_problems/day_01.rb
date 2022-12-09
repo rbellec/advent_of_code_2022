@@ -44,7 +44,7 @@ class Day01
   def problem_2(data)
     # Top 3 elves carry 207968 calories.
     top_3_elves = sorted_elves_calories_assoc(data).first(3)
-    tota_calories = top_3_elves.map(&:last).sum
+    top_3_elves.map(&:last).sum
   end
 
   # [[elve, calories], ...] sorted by calories amount

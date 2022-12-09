@@ -4,7 +4,7 @@ class Day05
     [N] [C]
     [Z] [M] [P]
      1   2   3
-    
+
     move 1 from 2 to 1
     move 3 from 1 to 3
     move 2 from 2 to 1
@@ -63,7 +63,7 @@ class Day05
   end
 
   def read_input(lines)
-    stacks_lines, separator, instructions_lines = lines.chunk { |line| !line.empty? }.map(&:last)
+    stacks_lines, _separator, instructions_lines = lines.chunk { |line| !line.empty? }.map(&:last)
     @stacks = read_stacks(stacks_lines)
     @instructions = read_instructions(instructions_lines)
   end

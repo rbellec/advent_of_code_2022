@@ -56,7 +56,7 @@ class Day02
   def problem_2
     reader = DataReader.new(day: 2, problem: 1)
     lines = reader.content
-    rounds = lines.map do |line|
+    lines.map do |line|
       line.split(" ")
     end.map do |move, issue|
       opponent_move = Move.new(MOVE_CODES_2[move.to_sym])
@@ -75,12 +75,12 @@ class Day02
     scores = rounds.map do |opponent, me|
       score(me: me, opponent: opponent)
     end
-    score = scores.sum
+    scores.sum
   end
 
   def score(me:, opponent:)
     move_value = SCORES[me.move]
     issue_score = SCORES[me.solve(opponent)]
-    round_score = move_value + issue_score
+    move_value + issue_score
   end
 end

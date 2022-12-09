@@ -2,7 +2,7 @@ class Day06
   TEST_DATA = "mjqjpqmgbljsphdztnvjfqwrcgsmlb"
 
   def self.call
-    index, buffer = new.problem_2
+    new.problem_2
   end
 
   attr_reader :stream

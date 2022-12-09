@@ -29,7 +29,7 @@ class Day03
   def problem_2
     # Could continue with duplicate detection, but I like sets
     bags = lines.map { |l| Rucksack.new(l) }
-    badges = bags
+    bags
       .map(&:item_set)
       .each_slice(3)
       .map { |bag1, bag2, bag3| (bag1 & bag2 & bag3).first } # badge for each group of 3
@@ -50,7 +50,7 @@ class Day03
     attr_reader :content, :compartments, :str_compartments, :item_set
 
     def initialize(line)
-      @items = line.split("")
+      @items = line.chars
       @compartments = @items.each_slice(line.size / 2).to_a
       @str_compartments = @compartments.map(&:join)
       @item_set = Set.new(@items)

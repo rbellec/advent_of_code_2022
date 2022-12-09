@@ -1,7 +1,7 @@
 module DailyProblemHelpers
   def open_dataset(dataset:)
-    day_number = self.name.match(/\d+/)[0].to_i
-    stream = case dataset
+    day_number = name.match(/\d+/)[0].to_i
+    case dataset
     when :test
       StringIO.new(self::TEST_DATA)
     when :problem
