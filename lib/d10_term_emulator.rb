@@ -167,7 +167,7 @@ def main
     operations = if ARGV[0]
       File.readlines(ARGV[0], chomp: true)
     else
-      Device::DEMO_DATA.lines
+      Device::DEMO_DATA.lines.map(&:chomp)
     end
     Device.new(operations).run
 
