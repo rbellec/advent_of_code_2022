@@ -2,7 +2,7 @@ require "curses"
 
 # Waiting time before 2 frames. Negative values means you have
 # to hit a key to trigger next frame. (used as curses getch timeout)
-FRAME_DURATION = 50
+FRAME_DURATION = 40
 
 class Screen
   LEFT_PADDING = 5
@@ -12,15 +12,41 @@ class Screen
     @screen_window = Curses::Window.new(8, 43, 4, LEFT_PADDING)
     @sprite_window = Curses::Window.new(3, 43, 13, LEFT_PADDING)
     @register_window = Curses::Window.new(3, 43, 17, LEFT_PADDING)
-    @code_window = Curses::Window.new(10, 42, 21, LEFT_PADDING)
+    @code_window = Curses::Window.new(10, 42, 21, LEFT_PADDING + 2)
+    @help_window = Curses::Window.new(6, 42, 32, LEFT_PADDING)
+
     @code_window.scrollok(true)
     @screen_window.box("|", "-")
     @register_window.box("|", "-")
+
     Curses.refresh
+    present_help
   end
 
-  def add_operations(op_code)
-    @code_window.addstr(op_code + "\n")
+  def present_help
+    @help_window.clear
+    @help_window.box("|", "-")
+    @help_window.setpos(1, 2)
+    @help_window.addstr "q: quit"
+    @help_window.setpos(2, 2)
+    @help_window.addstr "s: stop animation"
+    @help_window.setpos(3, 2)
+    @help_window.addstr "r: relaunch animation"
+    @help_window.setpos(4, 2)
+    @help_window.addstr "any key: next clock tick"
+    @help_window.refresh
+  end
+
+  def add_operations_line(tick, operation, next_register_value)
+    operation_str = if next_register_value
+      "\n%3d: %-12s | next register: %4d" % [tick, operation, next_register_value]
+    else
+      "\n%3d: %-12s |" % [tick, operation]
+    end
+
+    @code_window.addstr(operation_str)
+    @code_window.clrtoeol
+    @code_window.refresh
   end
 
   def update_screen(tick, register)
@@ -105,12 +131,19 @@ class Device
 
   # tick happend at each "clock tick" and listent to events
   def clock_tick(next_register_value: nil)
-    screen.add_operations(current_operation)
+    screen.add_operations_line(tick, current_operation, next_register_value)
     screen.update_tick_and_register(tick, register)
     screen.update_screen(tick, register)
 
     input = Curses.getch.to_s
-    exit 0 if input == "q"
+    case input
+    when "q"
+      exit 0
+    when "s"
+      Curses.timeout = -1
+    when "r"
+      Curses.timeout = FRAME_DURATION
+    end
 
     @tick += 1
     @register = next_register_value if next_register_value
