@@ -2,7 +2,7 @@ require "curses"
 
 # Waiting time before 2 frames. Negative values means you have
 # to hit a key to trigger next frame. (used as curses getch timeout)
-FRAME_DURATION = 1
+FRAME_DURATION = 50
 
 class Screen
   LEFT_PADDING = 5
@@ -24,9 +24,11 @@ class Screen
   end
 
   def update_screen(tick, register)
+    # clock tick starts on 1, hence the adjustment.
     row = (tick - 1) / 40
     col = (tick - 1) % 40
 
+    # +1 & +2 are for presentation only (padding in screen)
     @screen_window.setpos(row + 1, col + 2)
     if (register - 1..register + 1).cover? col
       @screen_window.attron(Curses::A_REVERSE) do
