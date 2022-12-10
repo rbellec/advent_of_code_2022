@@ -160,7 +160,7 @@ class Day10
 
   def self.call(dataset: :test)
     solver = new(open_dataset(dataset: dataset))
-    solver.problem_1
+    solver.problem_2
   end
 
   def initialize(data_stream)

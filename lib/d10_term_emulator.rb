@@ -1,23 +1,22 @@
 require "curses"
 
+# Waiting time before 2 frames. Negative values means you have
+# to hit a key to trigger next frame. (used as curses getch timeout)
+FRAME_DURATION = 1
+
 class Screen
   LEFT_PADDING = 5
   EMPTY_SPRITE_LINE = " " * 42 # 42 to ease writing sprites out of screen at left.
 
   def initialize
-    @screen_window = Curses::Window.new(8, 42, 4, LEFT_PADDING)
-    @sprite_window = Curses::Window.new(3, 42, 13, LEFT_PADDING)
-    @register_window = Curses::Window.new(3, 42, 17, LEFT_PADDING)
+    @screen_window = Curses::Window.new(8, 43, 4, LEFT_PADDING)
+    @sprite_window = Curses::Window.new(3, 43, 13, LEFT_PADDING)
+    @register_window = Curses::Window.new(3, 43, 17, LEFT_PADDING)
     @code_window = Curses::Window.new(10, 42, 21, LEFT_PADDING)
     @code_window.scrollok(true)
     @screen_window.box("|", "-")
-    # @register_window.box("|", "-")
-    # @sprite_window.box("|", "-")
-
+    @register_window.box("|", "-")
     Curses.refresh
-    @code_window.refresh
-    @screen_window.refresh
-    # update_screen
   end
 
   def add_operations(op_code)
@@ -25,12 +24,14 @@ class Screen
   end
 
   def update_screen(tick, register)
-    row = tick / 40
-    col = tick % 40
+    row = (tick - 1) / 40
+    col = (tick - 1) % 40
 
-    @screen_window.setpos(row + 1, col + 1)
+    @screen_window.setpos(row + 1, col + 2)
     if (register - 1..register + 1).cover? col
-      @screen_window.addch("#")
+      @screen_window.attron(Curses::A_REVERSE) do
+        @screen_window.addch("#")
+      end
     else
       @screen_window.addch(".")
     end
@@ -39,7 +40,7 @@ class Screen
   end
 
   def update_tick_and_register(tick, register)
-    tick_register = " %4d tick, register: %5d" % [tick, register]
+    tick_register = " %4d tick,    register: %5d" % [tick, register]
     sprite_line = if register < -2
       EMPTY_SPRITE_LINE
     else
@@ -54,6 +55,14 @@ class Screen
     @sprite_window.setpos(1, 1)
     @sprite_window.addstr(sprite_line)
     @sprite_window.refresh
+  end
+
+  def print_end_message
+    @register_window.clear
+    @register_window.box("|", "-")
+    @register_window.setpos(1, 1)
+    @register_window.addstr("End. Press any keys to quit.")
+    @register_window.refresh
   end
 end
 
@@ -79,6 +88,8 @@ class Device
         add($1.to_i)
       end
     end
+
+    screen.print_end_message
   end
 
   def noop
@@ -112,7 +123,7 @@ def init_curses
   Curses.noecho # Disables characters typed by the user to be echoed by Curses.getch as they are typed.
   # Curses.init_pair(1, 2, 0)
   Curses.stdscr.scrollok true
-  Curses.timeout = 100
+  Curses.timeout = FRAME_DURATION
 end
 
 def main
@@ -124,6 +135,9 @@ def main
       Device::DEMO_DATA.lines
     end
     Device.new(operations).run
+
+    Curses.timeout = -1
+    Curses.getch
   ensure
     Curses.close_screen
   end
