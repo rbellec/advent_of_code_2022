@@ -42,7 +42,7 @@ class Day11
     dataset = problem ? :problem : :test
     day_solver = new(open_dataset(dataset: dataset))
 
-    day_solver.problem_1
+    day_solver.problem_2
   end
 
   def initialize(data_stream)
@@ -88,9 +88,31 @@ class Day11
   end
 
   def problem_2
+    worryness_test_criteria_lcm = monkeys.map(&:test_divisible_by).inject{|lcm, divisor| lcm.lcm(divisor)}
+    worryness_test_criteria_product = monkeys.map(&:test_divisible_by).inject{|product, divisor| product * divisor}
+    # monkeys.each{ _1.worryness_divisor = worryness_test_criteria_lcm}
+    puts "Worryness Test Criteria LCM (tm): " + worryness_test_criteria_lcm.to_s
+    puts "Worryness Test Criteria Product (tm): " + worryness_test_criteria_product.to_s
+    sleep 2
+
+    10000.times do |i|
+      inspection_round(worryness_calcul_cap: worryness_test_criteria_product)
+      if i % 100 == 0
+        # puts "round #{i}: " + monkeys.map{ _1.inspection_count.to_s}.join(", ")
+        puts "After round %3d, the monkeys are holding items with these worry levels:" % i
+        puts monkeys.map(&:to_s).join("\n")
+        puts "inspection numbers: " + monkeys.map{ _1.inspection_count.to_s}.join(", ")
+      end
+
+    end
+    puts "After round %3d, the monkeys are holding items with these worry levels:" % 10000
+    puts monkeys.map(&:to_s).join("\n")
+
+    a, b = monkeys.map(&:inspection_count).sort.last(2)
+    a * b
   end
 
-  def inspection_round
+  def inspection_round(worryness_calcul_cap: nil)
     monkeys.each do |monkey|
       monkey_actions = monkey.inspection
 
@@ -99,6 +121,7 @@ class Day11
 
       # Reattribute items
       monkey_actions.each do |recipient, worry_level|
+        worry_level = worryness_calcul_cap ? worry_level % worryness_calcul_cap : worry_level
         monkeys[recipient].add_item(worry_level)
       end
     end
@@ -109,6 +132,10 @@ class Day11
       @number = number
       @worry_levels = []
       @inspection_count = 0
+
+      # Default to 3 for problem_1, lcm of all monkey divisors for problem 2
+      @worryness_divisor = 3
+
     end
 
     def clear_items
@@ -128,7 +155,7 @@ class Day11
       @inspection_count += worry_levels.count
       new_item_worry_levels = worry_levels
         .map { execute_operation(_1) }
-        .map { _1 / 3 }
+        # .map { _1 / 3 }
       recipients = new_item_worry_levels.map { recipient_monkey(_1) }
       recipients.zip(new_item_worry_levels)
     end
@@ -162,7 +189,11 @@ class Day11
     end
 
     attr_reader :number, :inspection_count
-    attr_accessor :worry_levels, :operation, :test_divisible_by, :recipient_when_test_succeed, :recipient_when_test_fail
+    attr_accessor :worry_levels, :operation, :test_divisible_by
+    attr_accessor :recipient_when_test_succeed, :recipient_when_test_fail
+
+    # Attempt to put 0 here will raise worriness to Exception.alls and infinites levels!
+    attr_accessor :worryness_divisor
   end
 
   attr_reader :monkeys
