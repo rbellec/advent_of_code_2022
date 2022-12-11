@@ -11,7 +11,8 @@ class #DailyClassName
 
   TEST_DATA = TEST_DATA_1
 
-  def self.call(dataset: :test)
+  def self.call(problem = false)
+    dataset = problem ? :problem : :test
     day_solver = new(open_dataset(dataset: dataset))
     day_solver.problem_1
   end

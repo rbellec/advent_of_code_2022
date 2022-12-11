@@ -38,7 +38,7 @@ class Day11
 
   TEST_DATA = TEST_DATA_1
 
-  def self.call(problem= false)
+  def self.call(problem = false)
     dataset = problem ? :problem : :test
     day_solver = new(open_dataset(dataset: dataset))
 
@@ -84,7 +84,7 @@ class Day11
       puts monkeys.map(&:to_s).join("\n")
     end
     a, b = monkeys.map(&:inspection_count).sort.last(2)
-    a*b
+    a * b
   end
 
   def problem_2
