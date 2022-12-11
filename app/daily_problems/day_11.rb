@@ -38,8 +38,10 @@ class Day11
 
   TEST_DATA = TEST_DATA_1
 
-  def self.call(dataset: :test)
+  def self.call(problem= false)
+    dataset = problem ? :problem : :test
     day_solver = new(open_dataset(dataset: dataset))
+
     day_solver.problem_1
   end
 
@@ -81,6 +83,8 @@ class Day11
       puts "After round %3d, the monkeys are holding items with these worry levels:" % i
       puts monkeys.map(&:to_s).join("\n")
     end
+    a, b = monkeys.map(&:inspection_count).sort.last(2)
+    a*b
   end
 
   def problem_2
@@ -104,6 +108,7 @@ class Day11
     def initialize(number)
       @number = number
       @worry_levels = []
+      @inspection_count = 0
     end
 
     def clear_items
@@ -120,6 +125,7 @@ class Day11
     #   ...
     # ]
     def inspection
+      @inspection_count += worry_levels.count
       new_item_worry_levels = worry_levels
         .map { execute_operation(_1) }
         .map { _1 / 3 }
@@ -155,7 +161,7 @@ class Day11
       "Monkey: %2d: %s" % [number, worry_levels.join(", ")]
     end
 
-    attr_reader :number
+    attr_reader :number, :inspection_count
     attr_accessor :worry_levels, :operation, :test_divisible_by, :recipient_when_test_succeed, :recipient_when_test_fail
   end
 
