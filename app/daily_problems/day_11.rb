@@ -76,8 +76,11 @@ class Day11
   end
 
   def problem_1
-    inspection_round
-    puts monkeys.map(&:to_s).join("\n")
+    20.times do |i|
+      inspection_round
+      puts "After round %3d, the monkeys are holding items with these worry levels:" % i
+      puts monkeys.map(&:to_s).join("\n")
+    end
   end
 
   def problem_2
@@ -110,6 +113,7 @@ class Day11
     def add_item(worry_level)
       worry_levels << worry_level
     end
+
     # Return an array of pairs
     # [
     #   [recipient, item worry level]
@@ -121,10 +125,6 @@ class Day11
         .map { _1 / 3 }
       recipients = new_item_worry_levels.map { recipient_monkey(_1) }
       recipients.zip(new_item_worry_levels)
-    end
-
-    def inspect_items(item_worry_level)
-      new_item_worry_levels = execute_operation(item_worry_level)
     end
 
     def recipient_monkey(item_worry_level)
@@ -152,7 +152,7 @@ class Day11
     end
 
     def to_s
-      "Monkey: %2d: %s" % [number, worry_levels.join(', ')]
+      "Monkey: %2d: %s" % [number, worry_levels.join(", ")]
     end
 
     attr_reader :number
