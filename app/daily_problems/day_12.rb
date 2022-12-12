@@ -30,7 +30,7 @@ class Day12
   def self.call(problem = false)
     dataset = problem ? :problem : :test
     day_solver = new(open_dataset(dataset: dataset))
-    day_solver.problem_1
+    day_solver.problem_2
   end
 
   attr_reader :origin, :destination, :map_width, :map_height
@@ -96,9 +96,9 @@ class Day12
     end
 
     # Because its so satisfying !
-    print_matrix(distance_matrix)
-    puts "-" * ELEM_OUTPUT_SIZE * (map_width + 1)
-    sleep(0.1)
+    # print_matrix(distance_matrix)
+    # puts "-" * ELEM_OUTPUT_SIZE * (map_width + 1)
+    # sleep(0.1)
     # Calculate shortest paths from node that have been modified
     calculates_paths_from.each do |updated_neighbour|
       shortest_paths_from(updated_neighbour)
@@ -120,11 +120,22 @@ class Day12
 
   def problem_1
     shortest_paths_from(origin)
-    print_matrix(distance_matrix)
+    # print_matrix(distance_matrix)
     distance(destination)
   end
 
   def problem_2
+    a_nodes = height_map.each_with_index.flat_map do |row, y|
+      row.each_with_index.map do |height, x|
+        # 'a' is height 97
+        height == 97 ? Node.new(x, y) : nil
+      end
+    end.compact
+    # Set all a at 0 and run the algorithm from all a to avoid having separated regions not detected correctly
+    a_nodes.each { set_distance(_1, 0) }
+    a_nodes.each { shortest_paths_from(_1) }
+    puts "result: #{distance(destination)}"
+    distance(destination)
   end
 
   def print_matrix(matrix)
