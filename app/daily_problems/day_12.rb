@@ -68,23 +68,12 @@ class Day12
 
   # return 1 if node in x,y exists and can be reached by height current_height, false otherwise
   def distance_to(current_height, destination_node)
-    if in_map?(destination_node) && (current_height - 1 >= @height_map[destination_node.y][destination_node.x])
+    if in_map?(destination_node) && (current_height + 1 >= @height_map[destination_node.y][destination_node.x])
       1
     else
       false
     end
   end
-
-  # return an array of 4 with path to [north, south, west, east], false if no path is possible, path value otherwise.
-  # def path_from(x, y)
-  #   current_height = @height_map[y][x]
-  #   [
-  #     distance(current_height, x, y-1)
-  #     distance(current_height, x, y+1)
-  #     distance(current_height, x-1, y)
-  #     distance(current_height, x+1, y)
-  #   ]
-  # end
 
   # Calculate all shortest_paths
   def shortest_paths_from(node)
@@ -99,16 +88,20 @@ class Day12
       target_distance_from_origin = distance(neighbour)
       distance_to_target_from_here = distance_to(current_height, neighbour)
 
-      if distance_to_target_form_here &&
-          (!target_distance_from_origin || target_distance_from_origin < current_distance + distance_to_target_from_here)
+      if distance_to_target_from_here &&
+          (!target_distance_from_origin || target_distance_from_origin > current_distance + distance_to_target_from_here)
         set_distance(neighbour, current_distance + distance_to_target_from_here)
-        shortest_paths_found_for << neighbour
+        calculates_paths_from << neighbour
       end
     end
 
+    # Because its so satisfying !
+    print_matrix(distance_matrix)
+    puts "-" * ELEM_OUTPUT_SIZE * (map_width + 1)
+    sleep(0.1)
     # Calculate shortest paths from node that have been modified
     calculates_paths_from.each do |updated_neighbour|
-      shortest_paths_from(node)
+      shortest_paths_from(updated_neighbour)
     end
   end
 
@@ -128,6 +121,7 @@ class Day12
   def problem_1
     shortest_paths_from(origin)
     print_matrix(distance_matrix)
+    distance(destination)
   end
 
   def problem_2
@@ -142,6 +136,4 @@ class Day12
 
     puts output_string
   end
-
-  # attr_reader :
 end
