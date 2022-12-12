@@ -88,8 +88,8 @@ class Day11
   end
 
   def problem_2
-    worryness_test_criteria_lcm = monkeys.map(&:test_divisible_by).inject{|lcm, divisor| lcm.lcm(divisor)}
-    worryness_test_criteria_product = monkeys.map(&:test_divisible_by).inject{|product, divisor| product * divisor}
+    worryness_test_criteria_lcm = monkeys.map(&:test_divisible_by).inject { |lcm, divisor| lcm.lcm(divisor) }
+    worryness_test_criteria_product = monkeys.map(&:test_divisible_by).inject { |product, divisor| product * divisor }
     # monkeys.each{ _1.worryness_divisor = worryness_test_criteria_lcm}
     puts "Worryness Test Criteria LCM (tm): " + worryness_test_criteria_lcm.to_s
     puts "Worryness Test Criteria Product (tm): " + worryness_test_criteria_product.to_s
@@ -101,9 +101,8 @@ class Day11
         # puts "round #{i}: " + monkeys.map{ _1.inspection_count.to_s}.join(", ")
         puts "After round %3d, the monkeys are holding items with these worry levels:" % i
         puts monkeys.map(&:to_s).join("\n")
-        puts "inspection numbers: " + monkeys.map{ _1.inspection_count.to_s}.join(", ")
+        puts "inspection numbers: " + monkeys.map { _1.inspection_count.to_s }.join(", ")
       end
-
     end
     puts "After round %3d, the monkeys are holding items with these worry levels:" % 10000
     puts monkeys.map(&:to_s).join("\n")
@@ -135,7 +134,6 @@ class Day11
 
       # Default to 3 for problem_1, lcm of all monkey divisors for problem 2
       @worryness_divisor = 3
-
     end
 
     def clear_items
@@ -155,7 +153,7 @@ class Day11
       @inspection_count += worry_levels.count
       new_item_worry_levels = worry_levels
         .map { execute_operation(_1) }
-        # .map { _1 / 3 }
+      # .map { _1 / 3 }
       recipients = new_item_worry_levels.map { recipient_monkey(_1) }
       recipients.zip(new_item_worry_levels)
     end
