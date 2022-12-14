@@ -46,7 +46,9 @@ class Day13
   def read(stream)
     @packets = stream.each_line.map do |line|
       # What do we say to the god of beautiful parsers? Not today !
+      # rubocop:disable Security/Eval
       eval(line)
+      # rubocop:enable Security/Eval
     end.compact
 
     # We always have 2 lines with lists and 1 empty line.
@@ -91,7 +93,7 @@ class Day13
     # end.join("\n")
     # puts result_str
 
-    results = comparisons.each_with_index.map do |result, index|
+    comparisons.each_with_index.map do |result, index|
       result == -1 ? index + 1 : 0
     end.sum
   end
@@ -101,12 +103,10 @@ class Day13
     divider_2 = [[6]]
     packets << divider_1
     packets << divider_2
-    ordered_packets = packets.sort{|a, b| compare(a, b)}
+    ordered_packets = packets.sort { |a, b| compare(a, b) }
     divider_indexes = ordered_packets.each_with_index.map do |packet, index|
       if packet == divider_1 || packet == divider_2
         index + 1
-      else
-        nil
       end
     end.compact
     divider_indexes.first * divider_indexes.last
