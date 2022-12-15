@@ -23,10 +23,18 @@ class Coord
     x == other.x && y == other.y
   end
 
+  def manhattan_distance(other)
+    (x-other.x).abs + (y-other.y).abs
+  end
+
   alias_method :eql?, :==
 
-  def to_s
-    "(#{x}, #{y})"
+  def to_s(resolution = nil)
+    if resolution
+      "(%#{resolution}d, %#{resolution}d)" % [x, y]
+    else
+      "(#{x}, #{y})"
+    end
   end
 
   alias_method :inspect, :to_s

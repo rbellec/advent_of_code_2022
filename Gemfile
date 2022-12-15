@@ -57,3 +57,5 @@ gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 
 # To demonstrate with simple examples how we can use treetop
 gem 'treetop'
+gem 'multi_range'
+

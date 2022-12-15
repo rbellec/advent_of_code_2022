@@ -1,16 +1,16 @@
 class Map2d
   attr_reader :height, :width, :x_max, :x_min, :y_max, :y_min
 
-  def self.create_from_coord_list(coord_list)
+  def self.create_from_coord_list(coord_list, build_map: true, default_value: false)
     xs = coord_list.map(&:x)
     ys = coord_list.map(&:y)
 
     # new(x_min: xs.min, x_max: xs.max, y_min: ys.min, y_max: ys.max, default_value: false)
-    new(x_min: xs.min, x_max: xs.max, y_min: ys.min, y_max: ys.max)
+    new(x_min: xs.min, x_max: xs.max, y_min: ys.min, y_max: ys.max, build_map:, default_value:)
   end
 
   # Later if needed
-  def initialize(x_min:, x_max:, y_min:, y_max:, default_value: false)
+  def initialize(x_min:, x_max:, y_min:, y_max:, default_value: false, build_map: true)
     @x_max = x_max
     @x_min = x_min
     @y_max = y_max
@@ -19,7 +19,9 @@ class Map2d
     @height = y_max - y_min + 1
     @width = x_max - x_min + 1
 
-    @map_content = Array.new(height) { Array.new(width, default_value) }
+    if build_map
+      @map_content = Array.new(height) { Array.new(width, default_value) }
+    end
   end
 
   def get(coord)
