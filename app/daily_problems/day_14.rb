@@ -45,19 +45,27 @@ class Day14
     xs = @rock_paths.map { |path| path.map(&:first) }.flatten
     ys = @rock_paths.map { |path| path.map(&:last) }.flatten
 
-    # I I go for Visualization
-    @x_min = xs.min
-    @x_max = xs.max
-    @y_min = ys.min
-    @y_max = ys.max
+    # We could probably manage without considering full size. Sand going on left or right had a definite number of points,
+    # But I wanted to try visualisation.
+    @y_min = 0
+    @y_max = ys.max + 2
+    @map_height = y_max + 1
+
+    @x_min = xs.min - map_height
+    @x_max = xs.max + map_height
 
     # width will certainly be augmented
     @map_width = 1 + @x_max - @x_min
-    @path_map = Array.new(@y_max + 1) { Array.new(map_width, false) }
+    @path_map = Array.new(map_height) { Array.new(map_width, false) }
     # @path_map will hold cells with either false, :sand or :rock
 
     @rock_paths.each { map_path(_1) }
     @transposed_map = @path_map.transpose
+
+    # Set floor
+    (x_min..x_max).each do |column|
+      set_map_slot(Coord.new(column, y_max), :rock)
+    end
   end
 
   def map_path(path)
@@ -145,6 +153,7 @@ class Day14
       next_sand_position = Coord.new(initial_sand_position.x, new_y)
 
       # How to behave when new_y is above (when column is full) ?
+      return [:full] if new_y < 0
 
       # Test diagonal left
       left_path = next_sand_position.down_left
@@ -174,14 +183,22 @@ class Day14
       true
     in :void
       false
+    in :full
+      false
     end
   end
 
   def problem_1
     # Build map
     sand = 0
+    print_map_status
+
     while drop_sand_and_actualize_map(500)
       sand += 1
+      if sand % 1000 == 0
+        print_map_status
+        puts "sand: #{sand}"
+      end
     end
 
     # 5.times { puts drop_sand_and_actualize_map(500) ? "Yes !" : "Finished" }
@@ -193,6 +210,6 @@ class Day14
   def problem_2
   end
 
-  attr_reader :rock_paths, :path_map, :x_min, :x_max, :y_min, :y_max, :map_width
+  attr_reader :rock_paths, :path_map, :x_min, :x_max, :y_min, :y_max, :map_width, :map_height
   attr_reader :transposed_map
 end
