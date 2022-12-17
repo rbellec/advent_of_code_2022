@@ -37,11 +37,11 @@ class Map2d
   end
 
   def column(x)
-    map_content.map{|row| row[x - x_min]}
+    map_content.map { |row| row[x - x_min] }
   end
 
   # Take a block to print each element
-  def print_map_status(sep="")
+  def print_map_status(sep = "")
     map_content.map do |row|
       row.map do |value|
         block_given? ? yield(value) : value
@@ -50,7 +50,7 @@ class Map2d
   end
 
   private
+
   attr_reader :map_content
   attr_writer :map_content, :height, :width, :x_max, :x_min, :y_max, :y_min
-
 end

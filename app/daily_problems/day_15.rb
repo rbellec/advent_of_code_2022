@@ -50,7 +50,7 @@ class Day15
     # @y_max = place_map.y_max
     # sensors.keys.each { place_map.set(_1, :sensor) }
     # sensors.values.each { place_map.set(_1, :beacon) }
-    @distances = sensors.map{|sensor, beacon| {sensor: sensor, beacon: beacon, distance: sensor.manhattan_distance(beacon)}}
+    @distances = sensors.map { |sensor, beacon| {sensor: sensor, beacon: beacon, distance: sensor.manhattan_distance(beacon)} }
     # @complete_line_range = MultiRange.new([x_min..x_max])
   end
 
@@ -86,7 +86,7 @@ class Day15
         # not_cover << "sensor #{sensor.to_s(3)}, coverage #{distance} (#{coverage_distance} on line #{line_number}), no coverage on line."
         nil
       else
-        result = (sensor.x - coverage_distance .. sensor.x + coverage_distance)
+        result = (sensor.x - coverage_distance..sensor.x + coverage_distance)
         # covers << "cover from %3d to %3d " % [result.begin, result.end] + "sensor #{sensor.to_s(3)}, distance #{distance} covers #{coverage_distance.to_s.ljust(3)} on line #{line_number}"
         result
       end
@@ -99,12 +99,12 @@ class Day15
   end
 
   def problem_1
-    distances.map{|a| "#{a[:sensor].to_s(3)} | #{a[:beacon].to_s(3)} | #{a[:distance]}"}
+    distances.map { |a| "#{a[:sensor].to_s(3)} | #{a[:beacon].to_s(3)} | #{a[:distance]}" }
 
     # coverage = coverage_range_for_line(10)
     coverage = coverage_range_for_line(2000000)
 
-    coverage.ranges.sum {|r| r.end - r.begin}
+    coverage.ranges.sum { |r| r.end - r.begin }
 
     # Found multi range gem whith already does the boiler-plate for ranges
 
@@ -119,7 +119,7 @@ class Day15
     problem_range.each do |line|
       line_range = problem_range - (problem_range & coverage_range_for_line(line))
       if line_range.size > 0
-        results += line_range.map{ Coord.new(_1, line)}
+        results += line_range.map { Coord.new(_1, line) }
       end
       if line % 10_000 == 0
         puts "#{line}"

@@ -24,7 +24,7 @@ class Coord
   end
 
   def manhattan_distance(other)
-    (x-other.x).abs + (y-other.y).abs
+    (x - other.x).abs + (y - other.y).abs
   end
 
   alias_method :eql?, :==
