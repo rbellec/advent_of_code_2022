@@ -88,36 +88,57 @@ class Day16
   end
 
   class PathElement
-    attr_reader :room, :valve_opened, :score, :cumulated_score
+    attr_reader :room_name, :valve_opened, :score, :cumulated_score
 
-    def initialize(room:, valve_opened:, score:, cumulated_score: )
-      room = room
+    def initialize(room_name:, valve_opened:, score:, cumulated_score: , minute_entered_in_the_room:)
+      room_name = room_name
       valve_opened = valve_opened
       score = score
-      cumulated_score = cumulated_score
+
+      # Minute left the room is the same if valve is not opened.
+      minute_entered_in_the_room = minute_entered_in_the_room
+
+      # Only if this room valve is opened
+      release_by_minute = release_by_minute
     end
   end
 
+  # I tried initially a small and simple first version which worked counting from 30 minutes to 0 and using reduced graph,
+  # It worked on demo data but not on problem data.
   # Explore path and yield them to a block in order to use an enumerator later.
-  def explore_path(current_path, minutes_left, released_pressure, &block)
+  def explore_path(current_path, minutes, release_per_minute, total_released=0, &block)
     # Minutes < 0 could be tested now, but for clarity I'll keep all yield at the same place.
-    current_room = rooms_by_name[current_path.last]
-    possible_next_directions = current_room
+    current_room_name = rooms_by_name[current_path.last[:room_name]]
+    last_release_by_minutes = current_path.last[:release_by_minute] || 0
+
+    possible_next_directions = current_room_name
       .path_to_working_rooms
       .reject do |room_name, distance|
-        current_path.include?(room_name)
+        current_path.map{_1[:room_name]}.include?(room_name)
       end
 
-    if minutes_left <= 0 || possible_next_directions.empty?
-      yield [released_pressure, current_path]
+    if minutes > max_minutes || possible_next_directions.empty?
+      yield [total_released, current_path]
     else
       possible_next_directions.each do |room_name, distance|
+        next_move_minute =  minutes + distance
+        next_release_minute = next_move_minute + 1
+        remaining_minutes_for_next_release = max_minutes - next_move_minute
+        additional_release_per_minute = rooms_by_name[room_name].flow_rate
+        next_release_per_minute = release_per_minute + additional_release_per_minute
+        next_total_released = total_released + (release_per_minute * distance) + next_release_per_minute
 
-        next_minutes_left = minutes_left - distance - 1
-        curent_choice_released_pressure = (next_minutes_left) * rooms_by_name[room_name].flow_rate
-        next_released_pressure = released_pressure + curent_choice_released_pressure
+        # curent_choice_released_pressure = remaining_minutes_for_next_release * release_per_minute
+        # next_released_pressure = released_pressure + curent_choice_released_pressure
+
+        this_move = {room_name: room_name, entered_in_room: next_move_minute, valve_released: next_release_minute,
+          release_by_minute: next_release_per_minute, minutes_of_release_till_end: remaining_minutes_for_next_release,
+          # pressure_released_till_end: curent_choice_released_pressure,
+          pressure_released_by_minute: next_release_per_minute,
+          total_released: next_total_released
+        }
         # byebug if minutes_left > 27 && room_name == "DD"
-        explore_path(current_path + [room_name], next_minutes_left, next_released_pressure, &block)
+        explore_path(current_path + [this_move], next_release_minute, next_release_per_minute, next_total_released, &block)
       end
     end
   end
@@ -125,9 +146,11 @@ class Day16
   def problem_1
     reduce_graph
     @results = []
-    explore_path(["AA"], 30, 0){|path| @results<<path}
-
-    self.results.max_by(&:first)
+    @max_minutes = 30
+    start = {room_name: "AA", entered_in_room: 1, valve_released: false}
+    # explore_path([start], 1, 0){|path| @results<<path}
+    enum_for(:explore_path, [start], 1, 0).max_by(&:first)
+    # self.results.max_by(&:first)
     # example: 1 is in AA but not noted
     # { 1:"AA", 2:"DD", "AA]
 
@@ -136,5 +159,5 @@ class Day16
   def problem_2
   end
 
-  attr_reader :rooms_definitions, :rooms_by_name, :working_valves, :results
+  attr_reader :rooms_definitions, :rooms_by_name, :working_valves, :results, :max_minutes
 end
