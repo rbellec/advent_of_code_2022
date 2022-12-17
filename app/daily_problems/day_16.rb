@@ -41,6 +41,7 @@ class Day16
   end
 
   def initialize(data_stream)
+    @max_minute = 30
     read(data_stream)
   end
 
@@ -88,76 +89,94 @@ class Day16
   end
 
   class PathElement
-    attr_reader :room_name, :valve_opened, :score, :cumulated_score
+    attr_reader :room_name, :minute_entered_in_room, :relase_per_minute, :release_duration, :total_released_by_this_operation, :path_score
 
-    def initialize(room_name:, valve_opened:, score:, cumulated_score: , minute_entered_in_the_room:)
-      room_name = room_name
-      valve_opened = valve_opened
-      score = score
+    def initialize(room_name: , minutes_when_entering_room:, relase_per_minute:, release_duration:,
+      total_released_by_this_operation:, path_score: )
+      @room_name = room_name
+      @relase_per_minute = relase_per_minute
+      @minute_entered_in_room = minutes_when_entering_room
 
-      # Minute left the room is the same if valve is not opened.
-      minute_entered_in_the_room = minute_entered_in_the_room
+      @release_duration = release_duration
+      @total_released_by_this_operation = total_released_by_this_operation
+      @path_score = path_score
+    end
 
-      # Only if this room valve is opened
-      release_by_minute = release_by_minute
+    def self.initial_node
+      new(room_name: "AA" , minutes_when_entering_room: 1, relase_per_minute: 0, release_duration: 0,
+        total_released_by_this_operation: 0, path_score: 0)
+    end
+
+    def pressure_release_started_at = minute_entered_in_room + 1
+    # def total_released = (1 + 30 - pressure_release_started_at) * relase_per_minute
+    def to_s
+      "Entered %s at minute %2d, valve released %3d per minute since minute %2d. Total released %4d, path_score: %4d" %
+        [room_name, minute_entered_in_room, relase_per_minute, pressure_release_started_at, total_released_by_this_operation,
+          path_score]
     end
   end
 
-  # I tried initially a small and simple first version which worked counting from 30 minutes to 0 and using reduced graph,
-  # It worked on demo data but not on problem data.
   # Explore path and yield them to a block in order to use an enumerator later.
-  def explore_path(current_path, minutes, release_per_minute, total_released=0, &block)
+  def explore_path(current_path, current_minute, total_released_pressure, &block)
     # Minutes < 0 could be tested now, but for clarity I'll keep all yield at the same place.
-    current_room_name = rooms_by_name[current_path.last[:room_name]]
-    last_release_by_minutes = current_path.last[:release_by_minute] || 0
-
-    possible_next_directions = current_room_name
+    current_room = rooms_by_name[current_path.last.room_name]
+    # byebug
+    possible_next_directions = current_room
       .path_to_working_rooms
       .reject do |room_name, distance|
-        current_path.map{_1[:room_name]}.include?(room_name)
+        current_path.map(&:room_name).include?(room_name)
       end
 
-    if minutes > max_minutes || possible_next_directions.empty?
-      yield [total_released, current_path]
+    # Last minute is included
+    if current_minute >= max_minute || possible_next_directions.empty?
+      yield current_path
     else
       possible_next_directions.each do |room_name, distance|
-        next_move_minute =  minutes + distance
-        next_release_minute = next_move_minute + 1
-        remaining_minutes_for_next_release = max_minutes - next_move_minute
-        additional_release_per_minute = rooms_by_name[room_name].flow_rate
-        next_release_per_minute = release_per_minute + additional_release_per_minute
-        next_total_released = total_released + (release_per_minute * distance) + next_release_per_minute
+        minutes_when_entering_room = current_minute + distance
+        minute_pressure_release_starts = minutes_when_entering_room + 1
 
-        # curent_choice_released_pressure = remaining_minutes_for_next_release * release_per_minute
-        # next_released_pressure = released_pressure + curent_choice_released_pressure
+        release_duration = 1 + max_minute - minute_pressure_release_starts
+        valve_release = rooms_by_name[room_name].flow_rate
+        total_released_by_this_operation = release_duration * valve_release
 
-        this_move = {room_name: room_name, entered_in_room: next_move_minute, valve_released: next_release_minute,
-          release_by_minute: next_release_per_minute, minutes_of_release_till_end: remaining_minutes_for_next_release,
-          # pressure_released_till_end: curent_choice_released_pressure,
-          pressure_released_by_minute: next_release_per_minute,
-          total_released: next_total_released
-        }
+        # We can leave next room at the same minute pressure release starts
+        next_current_minute = minute_pressure_release_starts
+        next_total_released_pressure = total_released_pressure + total_released_by_this_operation
+
+        path_step_record = PathElement.new(
+          room_name: , minutes_when_entering_room:, relase_per_minute: valve_release, release_duration:,
+          total_released_by_this_operation: , path_score: next_total_released_pressure
+        )
         # byebug if minutes_left > 27 && room_name == "DD"
-        explore_path(current_path + [this_move], next_release_minute, next_release_per_minute, next_total_released, &block)
+        # reminder : passing a block is just here to allow using Enumerator pattern.
+        explore_path(current_path + [path_step_record], next_current_minute, next_total_released_pressure, &block)
       end
     end
   end
 
   def problem_1
     reduce_graph
-    @results = []
-    @max_minutes = 30
-    start = {room_name: "AA", entered_in_room: 1, valve_released: false}
-    # explore_path([start], 1, 0){|path| @results<<path}
-    enum_for(:explore_path, [start], 1, 0).max_by(&:first)
-    # self.results.max_by(&:first)
-    # example: 1 is in AA but not noted
-    # { 1:"AA", 2:"DD", "AA]
+    path_explorer = enum_for(:explore_path, [PathElement.initial_node], 1, 0)
 
+    winning_path = path_explorer.max_by{|path| path.last.path_score}
+    puts "PathScore: #{winning_path.last.path_score}"
+    puts winning_path.map(&:to_s).join("\n")
+
+    # PathScore: 2359
+    # Entered AA at minute  1, valve released   0 per minute since minute  2. Total released    0, path_score:    0
+    # Entered PH at minute  3, valve released  11 per minute since minute  4. Total released  297, path_score:  297
+    # Entered AW at minute  6, valve released  21 per minute since minute  7. Total released  504, path_score:  801
+    # Entered LX at minute  9, valve released  22 per minute since minute 10. Total released  462, path_score: 1263
+    # Entered IN at minute 13, valve released  16 per minute since minute 14. Total released  272, path_score: 1535
+    # Entered OW at minute 16, valve released  25 per minute since minute 17. Total released  350, path_score: 1885
+    # Entered QR at minute 19, valve released  20 per minute since minute 20. Total released  220, path_score: 2105
+    # Entered SV at minute 22, valve released  24 per minute since minute 23. Total released  192, path_score: 2297
+    # Entered HH at minute 26, valve released  12 per minute since minute 27. Total released   48, path_score: 2345
+    # Entered HX at minute 29, valve released  14 per minute since minute 30. Total released   14, path_score: 2359
   end
 
   def problem_2
   end
 
-  attr_reader :rooms_definitions, :rooms_by_name, :working_valves, :results, :max_minutes
+  attr_reader :rooms_definitions, :rooms_by_name, :working_valves, :results, :max_minute
 end
