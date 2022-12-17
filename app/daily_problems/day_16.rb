@@ -41,7 +41,6 @@ class Day16
   end
 
   def initialize(data_stream)
-    @max_minute = 30
     read(data_stream)
   end
 
@@ -89,10 +88,12 @@ class Day16
   end
 
   class PathElement
-    attr_reader :room_name, :minute_entered_in_room, :relase_per_minute, :release_duration, :total_released_by_this_operation, :path_score
+    attr_reader :room_name, :minute_entered_in_room, :relase_per_minute, :release_duration, :total_released_by_this_operation
+    attr_reader :total_minutes_available, :path_score
+
 
     def initialize(room_name: , minutes_when_entering_room:, relase_per_minute:, release_duration:,
-      total_released_by_this_operation:, path_score: )
+      total_released_by_this_operation:, path_score:, total_minutes_available:)
       @room_name = room_name
       @relase_per_minute = relase_per_minute
       @minute_entered_in_room = minutes_when_entering_room
@@ -100,15 +101,16 @@ class Day16
       @release_duration = release_duration
       @total_released_by_this_operation = total_released_by_this_operation
       @path_score = path_score
+      @total_minutes_available = total_minutes_available
     end
 
-    def self.initial_node
-      new(room_name: "AA" , minutes_when_entering_room: 1, relase_per_minute: 0, release_duration: 0,
-        total_released_by_this_operation: 0, path_score: 0)
+    def self.initial_node(room_name: "AA", total_minutes_available:)
+      new(room_name:, minutes_when_entering_room: 1, relase_per_minute: 0, release_duration: 0,
+        total_released_by_this_operation: 0, path_score: 0, total_minutes_available:)
     end
 
     def pressure_release_started_at = minute_entered_in_room + 1
-    # def total_released = (1 + 30 - pressure_release_started_at) * relase_per_minute
+
     def to_s
       "Entered %s at minute %2d, valve released %3d per minute since minute %2d. Total released %4d, path_score: %4d" %
         [room_name, minute_entered_in_room, relase_per_minute, pressure_release_started_at, total_released_by_this_operation,
@@ -117,7 +119,7 @@ class Day16
   end
 
   # Explore path and yield them to a block in order to use an enumerator later.
-  def explore_path(current_path, current_minute, total_released_pressure, &block)
+  def explore_path(total_minutes_available, current_path, current_minute, total_released_pressure, &block)
     # Minutes < 0 could be tested now, but for clarity I'll keep all yield at the same place.
     current_room = rooms_by_name[current_path.last.room_name]
     # byebug
@@ -128,14 +130,14 @@ class Day16
       end
 
     # Last minute is included
-    if current_minute >= max_minute || possible_next_directions.empty?
+    if current_minute >= total_minutes_available || possible_next_directions.empty?
       yield current_path
     else
       possible_next_directions.each do |room_name, distance|
         minutes_when_entering_room = current_minute + distance
         minute_pressure_release_starts = minutes_when_entering_room + 1
 
-        release_duration = 1 + max_minute - minute_pressure_release_starts
+        release_duration = 1 + total_minutes_available - minute_pressure_release_starts
         valve_release = rooms_by_name[room_name].flow_rate
         total_released_by_this_operation = release_duration * valve_release
 
@@ -145,18 +147,19 @@ class Day16
 
         path_step_record = PathElement.new(
           room_name: , minutes_when_entering_room:, relase_per_minute: valve_release, release_duration:,
-          total_released_by_this_operation: , path_score: next_total_released_pressure
+          total_released_by_this_operation: , path_score: next_total_released_pressure, total_minutes_available:
         )
         # byebug if minutes_left > 27 && room_name == "DD"
         # reminder : passing a block is just here to allow using Enumerator pattern.
-        explore_path(current_path + [path_step_record], next_current_minute, next_total_released_pressure, &block)
+        explore_path(total_minutes_available, current_path + [path_step_record], next_current_minute, next_total_released_pressure, &block)
       end
     end
   end
 
   def problem_1
     reduce_graph
-    path_explorer = enum_for(:explore_path, [PathElement.initial_node], 1, 0)
+    path_initial_node = PathElement.initial_node(room_name: "AA", total_minutes_available: 30)
+    path_explorer = enum_for(:explore_path, 30, [path_initial_node], 1, 0)
 
     winning_path = path_explorer.max_by{|path| path.last.path_score}
     puts "PathScore: #{winning_path.last.path_score}"
@@ -176,7 +179,8 @@ class Day16
   end
 
   def problem_2
+    
   end
 
-  attr_reader :rooms_definitions, :rooms_by_name, :working_valves, :results, :max_minute
+  attr_reader :rooms_definitions, :rooms_by_name, :working_valves, :results
 end
