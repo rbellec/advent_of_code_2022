@@ -58,4 +58,8 @@ gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 # To demonstrate with simple examples how we can use treetop
 gem 'treetop'
 gem 'multi_range'
+gem 'matrix'
 
+# None of this code is intended to be run in "production", so this method is acceptable here.
+gem 'sorbet-static-and-runtime'
+gem 'tapioca', require: false, :group => :development
