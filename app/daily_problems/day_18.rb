@@ -35,7 +35,7 @@ class Day18
 
     def z = coords[2]
 
-    def adjascent_cubes = DIRECTIONS.map { new(coords + _1) }
+    def adjascent_cubes = DIRECTIONS.map { Cube.new(coords + _1) }
 
     def hash = coords.to_a.join(":").hash
 
@@ -57,18 +57,25 @@ class Day18
   def read(stream)
     @cubes = stream.each_line.map do |line|
       line.chomp!
-      Vector.elements(line.split(",").map(&:to_i))
+      coords = Vector.elements(line.split(",").map(&:to_i))
+      Cube.new(coords)
     end
   end
 
   def problem_1
-    # First draft: compute visible faces, which works only on convex structures.
+    # First draft: for each cure, compute the number of non immediatly obtructed faces.
+    # Works only on plain (no holes inside) convex and non convex structures.
+    # Works in current case.
+    cubes_faces_count = @cubes.map { [_1, 0] }.to_h
+    @cubes.each do |cube|
+      cubes_faces_count[cube] = cube.adjascent_cubes.count { |c| !cubes_faces_count.has_key?(c) }
+    end
 
-    self
+    cubes_faces_count.values.sum
   end
 
   def problem_2
   end
 
-  # attr_reader :
+  attr_reader :cubes
 end
