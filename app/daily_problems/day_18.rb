@@ -35,19 +35,26 @@ class Day18
 
     def z = coords[2]
 
-    def adjascent_cubes = DIRECTIONS.map { Cube.new(coords + _1) }
+    def adjacent_cubes = DIRECTIONS.map { Cube.new(coords + _1) }
 
-    def hash = coords.to_a.join(":").hash
+    delegate :hash, to: :coords
+
+    # def hash = coords.to_a.join(":").hash
 
     def ==(other) = coords == other.coords
     alias_method :eql?, :==
     def to_s(size = 3) = "(%#{size}d, %#{size}d, %#{size}d)" % coords.to_a
   end
 
-  def self.call(problem = false)
+  def self.call(level = 1, problem = false)
     dataset = problem ? :problem : :test
     day_solver = new(open_dataset(dataset: dataset))
-    day_solver.problem_2
+    case level
+    when 1
+      day_solver.problem_1
+    when 2
+      day_solver.problem_2
+    end
   end
 
   def initialize(data_stream)
@@ -60,6 +67,7 @@ class Day18
       coords = Vector.elements(line.split(",").map(&:to_i))
       Cube.new(coords)
     end
+    @cube_set = Set.new(@cubes)
   end
 
   def problem_1
@@ -68,7 +76,7 @@ class Day18
     # Works in current case.
     cubes_faces_count = @cubes.map { [_1, 0] }.to_h
     @cubes.each do |cube|
-      cubes_faces_count[cube] = cube.adjascent_cubes.count { |c| !cubes_faces_count.has_key?(c) }
+      cubes_faces_count[cube] = cube.adjacent_cubes.count { |c| !cubes_faces_count.has_key?(c) }
     end
 
     cubes_faces_count.values.sum
@@ -77,29 +85,43 @@ class Day18
   def problem_2
     # Try first all visible faces from 6 directions. Work only on convex volumes.
     # Not working on example. Other idea : mark all visible faces of cubes, then walk on adjascent visible faces.
-    # No time to try it now.
-    x_sorted_cubes = @cubes.sort_by(&:x)
-    y_sorted_cubes = @cubes.sort_by(&:y)
-    z_sorted_cubes = @cubes.sort_by(&:z)
+    # Finally saw an animation of a flooding algo. This is an attempt I prefere to try doing it before seing
+    # proper implementation online.
+    #
 
-    x_proj = Matrix.diagonal(0, 1,1)
-    y_proj = Matrix.diagonal(1,0,1)
-    z_proj = Matrix.diagonal(1,1,0)
+    x_min, x_max = cube_set.map(&:x).minmax
+    y_min, y_max = cube_set.map(&:y).minmax
+    z_min, z_max = cube_set.map(&:z).minmax
 
-    visible_z_up = z_sorted_cubes.map{|c| Vector[0,0,1] + z_proj * c.coords}
-    visible_z_down = z_sorted_cubes.reverse.map{|c| Vector[0,0,-1] + z_proj * c.coords}
+    x_min -= 1
+    x_max += 1
+    y_min -= 1
+    y_max += 1
+    z_min -= 1
+    z_max += 1
 
-    visible_x_up = x_sorted_cubes.map{|c| Vector[1,0,0] + x_proj * c.coords}
-    visible_x_down = x_sorted_cubes.reverse.map{|c| Vector[-1,0,0] + x_proj * c.coords}
+    # Create firt layer of flooding cubes
+    flooding_cubes = (x_min..x_max).to_a.product((y_min..y_max).to_a).map do |x, y|
+      Cube.new(Vector[x, y, z_min])
+    end.to_set
 
-    visible_y_up = y_sorted_cubes.map{|c| Vector[0,1,0] + y_proj * c.coords}
-    visible_y_down = y_sorted_cubes.reverse.map{|c| Vector[0,-1,0] + y_proj * c.coords}
+    flooding_cubes_previous_cardinal = 0
+    while flooding_cubes_previous_cardinal != flooding_cubes.size
+      flooding_cubes_previous_cardinal = flooding_cubes.size
+      added_cubes = flooding_cubes.flat_map { _1.adjacent_cubes }.filter do |cube|
+        # Check if created cube is in boundaries.
+        (x_min..x_max).cover?(cube.x) && (y_min..y_max).cover?(cube.y) && (z_min..z_max).cover?(cube.z)
+      end
+      flooding_cubes.merge(added_cubes)
+      flooding_cubes -= cube_set
+    end
 
-    visible_faces = Set.new()
-    [visible_z_up, visible_z_down, visible_x_up, visible_x_down, visible_y_up, visible_y_down].each{visible_faces.merge(_1)}
-    visible_faces
-
+    # Number of visible face is the sum of, for each cube of flooding cube set, the number of adjacent_cubes
+    # which are in the droplet
+    flooding_cubes.map do |flood_cube|
+      flood_cube.adjacent_cubes.count { cube_set.include?(_1) }
+    end.sum
   end
 
-  attr_reader :cubes
+  attr_reader :cubes, :cube_set
 end
