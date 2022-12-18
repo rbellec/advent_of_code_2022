@@ -47,7 +47,7 @@ class Day18
   def self.call(problem = false)
     dataset = problem ? :problem : :test
     day_solver = new(open_dataset(dataset: dataset))
-    day_solver.problem_1
+    day_solver.problem_2
   end
 
   def initialize(data_stream)
@@ -75,6 +75,30 @@ class Day18
   end
 
   def problem_2
+    # Try first all visible faces from 6 directions. Work only on convex volumes.
+    # Not working on example. Other idea : mark all visible faces of cubes, then walk on adjascent visible faces.
+    # No time to try it now.
+    x_sorted_cubes = @cubes.sort_by(&:x)
+    y_sorted_cubes = @cubes.sort_by(&:y)
+    z_sorted_cubes = @cubes.sort_by(&:z)
+
+    x_proj = Matrix.diagonal(0, 1,1)
+    y_proj = Matrix.diagonal(1,0,1)
+    z_proj = Matrix.diagonal(1,1,0)
+
+    visible_z_up = z_sorted_cubes.map{|c| Vector[0,0,1] + z_proj * c.coords}
+    visible_z_down = z_sorted_cubes.reverse.map{|c| Vector[0,0,-1] + z_proj * c.coords}
+
+    visible_x_up = x_sorted_cubes.map{|c| Vector[1,0,0] + x_proj * c.coords}
+    visible_x_down = x_sorted_cubes.reverse.map{|c| Vector[-1,0,0] + x_proj * c.coords}
+
+    visible_y_up = y_sorted_cubes.map{|c| Vector[0,1,0] + y_proj * c.coords}
+    visible_y_down = y_sorted_cubes.reverse.map{|c| Vector[0,-1,0] + y_proj * c.coords}
+
+    visible_faces = Set.new()
+    [visible_z_up, visible_z_down, visible_x_up, visible_x_down, visible_y_up, visible_y_down].each{visible_faces.merge(_1)}
+    visible_faces
+
   end
 
   attr_reader :cubes
