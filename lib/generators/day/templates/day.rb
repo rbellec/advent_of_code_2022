@@ -11,10 +11,15 @@ class #DailyClassName
 
   TEST_DATA = TEST_DATA_1
 
-  def self.call(problem = false)
+  def self.call(level=1,problem = false)
     dataset = problem ? :problem : :test
     day_solver = new(open_dataset(dataset: dataset))
-    day_solver.problem_1
+    case level
+    when 1
+      day_solver.problem_1
+    when 2
+      day_solver.problem_2
+    end
   end
 
   def initialize(data_stream)
