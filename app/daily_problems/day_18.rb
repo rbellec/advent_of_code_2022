@@ -39,10 +39,11 @@ class Day18
 
     delegate :hash, to: :coords
 
-    # def hash = coords.to_a.join(":").hash
-
     def ==(other) = coords == other.coords
+
     alias_method :eql?, :==
+
+    # I always create to_s function to play with data in console.
     def to_s(size = 3) = "(%#{size}d, %#{size}d, %#{size}d)" % coords.to_a
   end
 
@@ -71,8 +72,8 @@ class Day18
   end
 
   def problem_1
-    # First draft: for each cure, compute the number of non immediatly obtructed faces.
-    # Works only on plain (no holes inside) convex and non convex structures.
+    # First draft: for each cube, compute the number of non immediatly obtructed faces.
+    # Works only on plain (not hollow) convex and non convex structures.
     # Works in current case.
     cubes_faces_count = @cubes.map { [_1, 0] }.to_h
     @cubes.each do |cube|
@@ -83,11 +84,10 @@ class Day18
   end
 
   def problem_2
-    # Try first all visible faces from 6 directions. Work only on convex volumes.
+    # Try first all visible faces from 6 directions wich works only on convex volumes : failed.
     # Not working on example. Other idea : mark all visible faces of cubes, then walk on adjascent visible faces.
-    # Finally saw an animation of a flooding algo. This is an attempt I prefere to try doing it before seing
-    # proper implementation online.
-    #
+    # Finally saw an animation of a flooding algo. As written in readme, I prefere to try doing it before seing
+    # proper implementation online, so you may find better examples online.
 
     x_min, x_max = cube_set.map(&:x).minmax
     y_min, y_max = cube_set.map(&:y).minmax
