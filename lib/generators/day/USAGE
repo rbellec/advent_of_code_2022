@@ -1,0 +1,11 @@
+Description:
+    Creates the AOC files for current day. Credentials are required (in generator)
+    to fetch problem data.
+
+Example:
+    bin/rails generate day 10
+
+    This will create:
+        app/daily_problems/day_10.rb
+        problems_data/data_day_10_1.txt
+
