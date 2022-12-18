@@ -125,7 +125,7 @@ class Day16
   def explore_path(total_minutes_available, current_path, current_path_score, &block)
     # select the next available operator
     current_operator_positions = current_path.group_by(&:operator).transform_values! { |operator_path| operator_path.max_by(&:next_available_minute) }.values
-    remaining_operators = current_operator_positions.filter{_1.next_available_minute <= total_minutes_available}.sort_by(&:next_available_minute)
+    remaining_operators = current_operator_positions.filter { _1.next_available_minute <= total_minutes_available }.sort_by(&:next_available_minute)
 
     # Note : in case we have multiple elephant (next idea, but not sure I'll have time to test i) we have to explore different operator orders.
 
@@ -140,7 +140,7 @@ class Day16
       current_minute = operator_path_element.next_available_minute
 
       possible_next_directions = rooms_by_name[operator_room_name].path_to_working_rooms.except(*current_path.map(&:room_name))
-      possible_next_directions_in_remaining_time = possible_next_directions.reject{ _2 + current_minute > total_minutes_available}
+      possible_next_directions_in_remaining_time = possible_next_directions.reject { _2 + current_minute > total_minutes_available }
 
       if possible_next_directions_in_remaining_time.empty?
         # End of path for this operator. We return the full path even of other did not finish, can optimize later (and will never do, of course !)
@@ -156,7 +156,7 @@ class Day16
           total_released_by_this_operation = release_duration * valve_release
 
           # We can leave next room at the same minute pressure release starts
-          next_current_minute = minute_pressure_release_starts
+          # next_current_minute = minute_pressure_release_starts
           next_total_released_pressure = current_path_score + total_released_by_this_operation
 
           path_step_record = PathElement.new(
@@ -172,7 +172,6 @@ class Day16
   end
 
   def problem_1
-
     # byebug
     path_initial_node = PathElement.initial_node(room_name: "AA", paths_start_at_minute: 1, operator: :human)
     path_explorer = enum_for(:explore_path, 30, [path_initial_node], 0)
@@ -201,9 +200,7 @@ class Day16
       PathElement.initial_node(room_name: "AA", paths_start_at_minute: 1, operator: :elephant)
     ]
 
-
     path_explorer = enum_for(:explore_path, 26, initial_path, 0)
-
 
     # winning_path = path_explorer.max_by { |path| path.last.path_score }
     # winning_path = path_explorer.next

@@ -71,12 +71,12 @@ class Day15
 
   def coverage_range_for_line(line_number)
     # To print coverage information
-    not_cover = []
-    covers = []
+    # not_cover = []
+    # covers = []
 
     raw_coverage_ranges = distances.map do |definition|
       sensor = definition[:sensor]
-      beacon = definition[:beacon]
+      # beacon = definition[:beacon]
       distance = definition[:distance]
 
       y_diff = (line_number - sensor.y).abs
@@ -122,7 +122,7 @@ class Day15
         results += line_range.map { Coord.new(_1, line) }
       end
       if line % 10_000 == 0
-        puts "#{line}"
+        puts line.to_s
         puts results.map(&:to_s).join(", ")
       end
     end

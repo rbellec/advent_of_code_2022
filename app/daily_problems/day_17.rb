@@ -24,7 +24,6 @@ class Day17
   end
 
   def problem_1
-
   end
 
   def problem_2
