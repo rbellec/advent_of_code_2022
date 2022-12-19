@@ -80,6 +80,7 @@ GEM
     childprocess (4.1.0)
     concurrent-ruby (1.1.10)
     crass (1.0.6)
+    digest (3.1.0)
     erubi (1.11.0)
     fast_interval_tree (0.2.2)
     ffi (1.15.5)
@@ -110,6 +111,12 @@ GEM
     multi_range (2.1.1)
       fast_interval_tree (~> 0.2.0)
       roulette-wheel-selection (~> 1.1.1)
+    net-protocol (0.1.3)
+      timeout
+    net-smtp (0.3.1)
+      digest
+      net-protocol
+      timeout
     nio4r (2.5.8)
     nokogiri (1.13.9-arm64-darwin)
       racc (~> 1.4)
@@ -186,6 +193,7 @@ GEM
     sqlite3 (1.5.4-arm64-darwin)
     thor (1.2.1)
     tilt (2.0.11)
+    timeout (0.3.0)
     treetop (1.6.12)
       polyglot (~> 0.3)
     turbolinks (5.2.1)
@@ -228,6 +236,7 @@ DEPENDENCIES
   matrix
   minitest-rails
   multi_range
+  net-smtp
   polyglot
   puma (~> 5.0)
   rack-mini-profiler (~> 2.0)
