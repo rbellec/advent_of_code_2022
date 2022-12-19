@@ -1,10 +1,10 @@
 grammar BluePrints
   rule blueprints
-    (blueprint "\n") +
+    (blueprint "\n")+
   end
 
   rule blueprint
-    'Blueprint ' number ':' robot_cost +
+    'Blueprint ' number ':' robot_cost+
   end
 
   rule robot_cost
