@@ -1,0 +1,25 @@
+grammar BluePrints
+  rule blueprints
+    (blueprint "\n") +
+  end
+
+  rule blueprint
+    'Blueprint ' number ':' robot_cost +
+  end
+
+  rule robot_cost
+    'Each ' material ' robot costs ' cost (' and ' cost)* '.' ' '?
+  end
+
+  rule cost
+    number ' ' material
+  end
+
+  rule number
+    [0-9]+
+  end
+
+  rule material
+    'ore' / 'clay' / 'obsidian' / 'geode'
+  end
+end
