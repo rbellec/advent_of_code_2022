@@ -50,6 +50,8 @@ group :test do
   gem 'selenium-webdriver', '>= 4.0.0.rc1'
   # Easy installation and use of web drivers to run system tests with browsers
   gem 'webdrivers'
+
+  gem "minitest-rails"
 end
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
@@ -57,9 +59,9 @@ gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 
 # To demonstrate with simple examples how we can use treetop
 gem 'treetop'
+# Polyglot is used to load treetop grammar direclty in ruby.
+gem 'polyglot'
 gem 'multi_range'
 gem 'matrix'
+gem 'benchmark'
 
-# None of this code is intended to be run in "production", so this method is acceptable here.
-gem 'sorbet-static-and-runtime'
-gem 'tapioca', require: false, :group => :development

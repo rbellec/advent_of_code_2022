@@ -1,18 +1,18 @@
 grammar BluePrints
   rule blueprints
-    (blueprint "\n")+
+    (blueprint sp)+
   end
 
   rule blueprint
-    'Blueprint ' number ':' robot_cost+
+    'Blueprint' sp number sp ':' sp robot_cost+
   end
 
   rule robot_cost
-    'Each ' material ' robot costs ' cost (' and ' cost)* '.' ' '?
+    sp 'Each' sp material sp 'robot costs' sp cost ( sp 'and' sp cost)* '.'
   end
 
   rule cost
-    number ' ' material
+    number sp material
   end
 
   rule number
@@ -21,5 +21,9 @@ grammar BluePrints
 
   rule material
     'ore' / 'clay' / 'obsidian' / 'geode'
+  end
+
+  rule sp
+    [ \n\t]*
   end
 end
