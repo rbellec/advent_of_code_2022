@@ -12,7 +12,11 @@ grammar BluePrints
   end
 
   rule cost
-    number sp material
+    number sp material {
+      def cost_hash
+        {material.as_symbol => number.text_value.to_i}
+      end
+    }
   end
 
   rule number
@@ -20,7 +24,11 @@ grammar BluePrints
   end
 
   rule material
-    'ore' / 'clay' / 'obsidian' / 'geode'
+    ('ore' / 'clay' / 'obsidian' / 'geode') {
+      def as_symbol
+        text_value.to_sym
+      end
+    }
   end
 
   rule sp

@@ -17,6 +17,10 @@ class Day19
   # I'll do it in the code here, but obviously we would use a dedicated framework in a real project (rspec, minitest...)
 
   class ParsersTests
+    def self.test(name, bool_value)
+      puts (bool_value ? "." : "error #{name}")
+    end
+
     def self.test_parsers
       # You can call a specific rule using the root: parameter
       # First focus on parser and leave ruby codes (rules actions) aside. It's much faster to have a running parser then extract what you need
@@ -26,24 +30,32 @@ class Day19
       parser = BluePrintsParser.new
 
       # in rspec: expect(parser.parse("10", root: :number)).not_to be_nil
-      results << (parser.parse("10", root: :number) ? "." : "error number")
-      results << (parser.parse("clay", root: :material) ? "." : "error material")
-      results += ["10 clay", "5 ore", "12 obsidian"].map{parser.parse(_1, root: :cost) ? "." : "error cost"}
-      results << (parser.parse("Each ore robot costs 4 ore.", root: :robot_cost) ? "." : "error robot_cost")
-      results << (parser.parse("Each geode robot costs 2 ore and 7 obsidian.", root: :robot_cost) ? "." : "error robot_cost")
-      results << (parser.parse("Blueprint 2: Each ore robot costs 2 ore. Each clay robot costs 3 ore. Each obsidian robot costs 3 ore and 8 clay. Each geode robot costs 3 ore and 12 obsidian.", root: :blueprint) ? "." : "error blueprint")
-      results << (parser.parse(Day19::TEST_DATA, root: :blueprints) ? "." : "error blueprints")
+      test "number", parser.parse("10", root: :number)
+      test "material", parser.parse("clay", root: :material)
+      ["10 clay", "5 ore", "12 obsidian"].each do |test_string|
+        test "cost", parser.parse(test_string, root: :cost)
+      end
+      test "robot_cost", parser.parse("Each ore robot costs 4 ore.", root: :robot_cost)
+      test "robot_costs", parser.parse("Each geode robot costs 2 ore and 7 obsidian.", root: :robot_cost)
+      test "blueprint", parser.parse("Blueprint 2: Each ore robot costs 2 ore. Each clay robot costs 3 ore. Each obsidian robot costs 3 ore and 8 clay. Each geode robot costs 3 ore and 12 obsidian.", root: :blueprint)
+      test "blueprints", parser.parse(Day19::TEST_DATA, root: :blueprints)
       puts results.join(" ")
     end
 
-    # Once I am sure the parsers are working correctly, I work on their individual return values
+    # Once I am sure the parsers are working correctly, I work on their individual return values.
+    # This is the moment I start to add methods to parser rules. Avoid method with the same name as subrule !
     def self.test_parsers_return_values
-      results = []
-      require "day_19_grammar"
+      # Simulate a test framework
+      def ptest(name, bool_value)
+        puts (bool_value ? "." : "error #{name}")
+      end
+
+      # require "day_19_grammar"
       parser = BluePrintsParser.new
-      parser.parse("10 clay", root: :cost)
+      r=parser.parse("10 clay", root: :cost)
       # Same, this would be simpler with a real test framework
-      results << (parser.parse("10 clay", root: :cost).cost == {cost: number.to_s.to_i, material: material.to_sym} ? "." : "error material")
+      ptest("cost return value", parser.parse("10 clay", root: :cost).cost_hash == {clay: 10})
+      # test "robot definition", parser.parse("Each ore robot costs 4 ore.", root: :robot_cost) == {collect: :ore, cost:[{clay: 10}]}
       # results += ["", "5 ore", "12 obsidian"].map{parser.parse(_1, root: :cost) ? "." : "error material"}
       # results << (parser.parse("Each ore robot costs 4 ore.", root: :robot_cost) ? "." : "error robot_cost")
       # results << (parser.parse("Each geode robot costs 2 ore and 7 obsidian.", root: :robot_cost) ? "." : "error robot_cost")
