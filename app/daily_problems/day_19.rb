@@ -38,8 +38,37 @@ class Day19
     @blueprints = BluePrintsParser.new.parse(text_definition).blueprints
   end
 
+  # Let's build possible paths to create one robot
+  def path_to_build(blueprint, robot)
+    costs = blueprint[robot]
+
+    # If you need 7 obsidian ans 2 ore to build a geode robot, the longest time (once you have at least one of each) will be 7 minutes.
+    longest_cost = costs.values.max
+
+    # Let's iterate on "cost duration" to build path do build this robot asap.
+    (1..longest_cost).map
+    sub_robot_paths =
+  end
+
+  def robot_state_per_minute(blueprint, max_minutes, status)
+
+  end
+
+  # Let's have a visual representation of this
+  def blueprint_equations(blueprint)
+    costs = blueprint[:definition]
+    costs.map do |robot, ressources|
+      "#{robot}_robot = " + ressources.map { |ressource, cost| cost.to_s + "." + ressource.to_s }.join(" + ")
+    end.join("\n")
+  end
+
   def problem_1
-    
+    # I initially thought it could be a Linear proramming problem and... I spent too much time on writing the treetop parser example !
+    # I am not sure it's a flow or LP problem anymore... And will try to solve it analysing shortest paths to create geode robots.
+    # To reduce state space I'll try to take the problem from geode robots. The score is basically the number
+    # of geode robots * number of minute they run. For each blue print lets find the path to build a geode robot.
+    puts blueprint_equations(@blueprints.first.last)
+    # Score is number of geode robots
   end
 
   def problem_2
