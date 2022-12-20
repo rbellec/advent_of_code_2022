@@ -11,7 +11,7 @@ class Day20
     4
   DATA
 
-  def self.call(level=1,problem = false)
+  def self.call(level = 1, problem = false)
     dataset = problem ? :problem : :test
     day_solver = new(open_dataset(dataset: dataset))
     case level
@@ -40,7 +40,7 @@ class Day20
 
     # value = array.delete_at(index)
     new_index = (index + value) % max_index
-    if (new_index == 0)
+    if new_index == 0
       new_index = max_index
     end
 
@@ -63,31 +63,28 @@ class Day20
   # move(2, [0,0,3,0,0])
   # move(2, [0,0,5,0,0])
 
-
   def problem_1
-    work_array = initial_code.map{ |num| {value: num, moved: false} }
-    puts work_array.map{_1[:value]}.join(", ")
+    work_array = initial_code.map { |num| {value: num, moved: false} }
+    puts work_array.map { _1[:value] }.join(", ")
 
     # Looking from the beginning of the array may not be optimal (n^2) but seems easy enough to try first
-    while next_item_index = work_array.find_index{not _1[:moved]}
+    while (next_item_index = work_array.find_index { !(_1[:moved]) })
       # puts ""
-      element_added_at = move(next_item_index, work_array)
+      move(next_item_index, work_array)
       # puts work_array.map{_1[:value]}.join(", ")
     end
-    result = work_array.map{_1[:value]}
+    work_array.map { _1[:value] }
 
     grove_coordinates(work_array)
-
   end
 
   def problem_2
     decryption_key = 811589153
     work_array = initial_code.each_with_index.map do |num, index|
       # current_index could have been used for a faster algorithm (or linked lists). Will see.
-      { value: 811589153 * num,
-        initial_index: index,
-        current_index: index
-      }
+      {value: decryption_key * num,
+       initial_index: index,
+       current_index: index}
     end
 
     10.times do
@@ -97,7 +94,7 @@ class Day20
 
       # There is a shorter way than finding the next element every time... I'll have a look at other solutions :)
       (0...initial_code.size).each do |initial_index|
-        elem_index = work_array.find_index{|element| element[:initial_index] == initial_index}
+        elem_index = work_array.find_index { |element| element[:initial_index] == initial_index }
         move(elem_index, work_array)
       end
     end
@@ -106,9 +103,9 @@ class Day20
   end
 
   def grove_coordinates(array)
-    index_of_0 = array.find_index{_1[:value] == 0}
-    answer_locations = [1000, 2000, 3000].map{(_1 + index_of_0) % array.size}
-    answers = answer_locations.map{array[_1][:value]}
+    index_of_0 = array.find_index { _1[:value] == 0 }
+    answer_locations = [1000, 2000, 3000].map { (_1 + index_of_0) % array.size }
+    answers = answer_locations.map { array[_1][:value] }
 
     puts answers.join(", ")
     answers.sum
