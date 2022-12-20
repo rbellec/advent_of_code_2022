@@ -1,23 +1,32 @@
 grammar BluePrints
   rule blueprints
-    (blueprint sp)+
+    (blueprint sp)+ {
+      def blueprints
+        elements.map{|element| bp = element.blueprint.blueprint; [bp[:blueprint], bp]}.to_h
+      end
+    }
   end
 
   rule blueprint
-    'Blueprint' sp number sp ':' sp robot_cost+
+    'Blueprint' sp number sp ':' sp robot_blueprints:(robot_blueprint+) {
+      def blueprint
+        costs = robot_blueprints.elements.map{ |robot_cost| robot_cost.robot_blueprint}
+        costs_hash = {}.merge(*costs)
+        {blueprint: number.text_value.to_i, definition: costs_hash}
+      end
+    }
   end
 
-  rule robot_cost
-    sp 'Each' sp material sp 'robot costs' sp first_cost:cost rest_costs:( sp 'and' sp cost)* '.'{
+  rule robot_blueprint
+    sp 'Each' sp material sp 'robot costs' sp first_cost:cost rest_costs:( sp 'and' sp cost)* '.' {
       def robot_blueprint
         # Here we could built an object. I stick with hashes since I am way over my "allowed" time.
-        {material.as_symbol => agregated_cost}
-      end
-
-      def agregated_cost
         agregated_cost = first_cost.cost_hash
-        rest_costs.elements.each{|element| agregated_cost.merge(element.cost.cost_hash)}
-        agregated_cost
+        rest_costs.elements.each do |element|
+          agregated_cost.merge!(element.cost.cost_hash)
+        end
+
+        {material.as_symbol => agregated_cost}
       end
     }
   end
