@@ -6,7 +6,6 @@
 # You will find the treetop parser in the `grammars/day_19_grammar.treetop` file and the explanation in
 # `build_treetop_parser_workflow.rb`
 
-
 class Day19
   extend DailyProblemHelpers
 
@@ -15,7 +14,7 @@ class Day19
     Blueprint 2: Each ore robot costs 2 ore. Each clay robot costs 3 ore. Each obsidian robot costs 3 ore and 8 clay. Each geode robot costs 3 ore and 12 obsidian.
   DATA
 
-  def self.call(level=1,problem = false)
+  def self.call(level = 1, problem = false)
     dataset = problem ? :problem : :test
     day_solver = new(open_dataset(dataset: dataset))
     case level
@@ -40,18 +39,17 @@ class Day19
 
   # Let's build possible paths to create one robot
   def path_to_build(blueprint, robot)
-    costs = blueprint[robot]
+    # costs = blueprint[robot]
 
     # If you need 7 obsidian ans 2 ore to build a geode robot, the longest time (once you have at least one of each) will be 7 minutes.
-    longest_cost = costs.values.max
+    # longest_cost = costs.values.max
 
     # Let's iterate on "cost duration" to build path do build this robot asap.
-    (1..longest_cost).map
-    sub_robot_paths =
+    # (1..longest_cost).map
+    # sub_robot_paths =
   end
 
   def robot_state_per_minute(blueprint, max_minutes, status)
-
   end
 
   # Let's have a visual representation of this

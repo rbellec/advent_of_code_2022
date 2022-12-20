@@ -1,4 +1,3 @@
-
 # # How to write a treetop parser
 # 1 First I write a first grammar draft that allows me to consider all rules and sub rules. This is generally NOT working.
 # 2 TDD starting with simplest rules. The first goal is just to have the parser works on input data, we will address building result values later.
@@ -33,7 +32,6 @@ DATA
 def test(name, bool_value)
   print(bool_value ? " . " : "error #{name}")
 end
-
 
 # First parser tests. The goal here is to test one by one, starting with the simplest, all rules.
 # a simple rule not working as expected can be difficult to test from more complex ones. TDD is perfect to
