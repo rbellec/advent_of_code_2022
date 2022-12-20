@@ -45,16 +45,12 @@ class Day19
     # Once I am sure the parsers are working correctly, I work on their individual return values.
     # This is the moment I start to add methods to parser rules. Avoid method with the same name as subrule !
     def self.test_parsers_return_values
-      # Simulate a test framework
-      def ptest(name, bool_value)
-        puts (bool_value ? "." : "error #{name}")
-      end
 
-      # require "day_19_grammar"
+      require "day_19_grammar"
       parser = BluePrintsParser.new
       r=parser.parse("10 clay", root: :cost)
       # Same, this would be simpler with a real test framework
-      ptest("cost return value", parser.parse("10 clay", root: :cost).cost_hash == {clay: 10})
+      test("cost return value", parser.parse("10 clay", root: :cost).cost_hash == {clay: 10})
       # test "robot definition", parser.parse("Each ore robot costs 4 ore.", root: :robot_cost) == {collect: :ore, cost:[{clay: 10}]}
       # results += ["", "5 ore", "12 obsidian"].map{parser.parse(_1, root: :cost) ? "." : "error material"}
       # results << (parser.parse("Each ore robot costs 4 ore.", root: :robot_cost) ? "." : "error robot_cost")

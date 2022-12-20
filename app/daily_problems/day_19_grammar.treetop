@@ -8,7 +8,18 @@ grammar BluePrints
   end
 
   rule robot_cost
-    sp 'Each' sp material sp 'robot costs' sp cost ( sp 'and' sp cost)* '.'
+    sp 'Each' sp material sp 'robot costs' sp first_cost:cost rest_costs:( sp 'and' sp cost)* '.'{
+      def robot_blueprint
+        # Here we could built an object. I stick with hashes since I am way over my "allowed" time.
+        {material.as_symbol => agregated_cost}
+      end
+
+      def agregated_cost
+        agregated_cost = first_cost.cost_hash
+        rest_costs.elements.each{|element| agregated_cost.merge(element.cost.cost_hash)}
+        agregated_cost
+      end
+    }
   end
 
   rule cost
