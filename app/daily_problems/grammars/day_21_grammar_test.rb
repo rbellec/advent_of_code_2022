@@ -42,7 +42,7 @@ def test_parsers
   end
 
   a = parser.parse("root: pppw + sjmn", root: :monkey)
-    byebug
+  byebug
   test "monkey_1", parser.parse("root: pppw + sjmn", root: :monkey)
   test "monkey_2", parser.parse("dbpl: 5", root: :monkey)
   puts "end"
@@ -63,12 +63,10 @@ def test_parsers_return_values
   test("name", parser.parse("pppw", root: :name).text_value == "pppw")
 
   test("operation",
-    parser.parse("pppw + sjmn", root: :operation).operation == {operator: "+", lhs: "pppw" , rhs: "sjmn"}
-  )
+    parser.parse("pppw + sjmn", root: :operation).operation == {operator: "+", lhs: "pppw", rhs: "sjmn"})
 
   test("monkey",
-    parser.parse("root: pppw + sjmn", root: :monkey).monkey == ["root", {operator: "+", lhs: "pppw" , rhs: "sjmn"}]
-  )
+    parser.parse("root: pppw + sjmn", root: :monkey).monkey == ["root", {operator: "+", lhs: "pppw", rhs: "sjmn"}])
 
   # pp parser.parse(TEST_DATA, root: :blueprints).blueprints
   puts "end rv"
