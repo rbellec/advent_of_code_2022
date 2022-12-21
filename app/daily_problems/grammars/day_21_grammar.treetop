@@ -1,0 +1,54 @@
+grammar MonkeysMath
+  rule monkey_definitions
+    (monkey sp)+ {
+      def monkeys
+        elements.map{|element| bp = element.monkey.monkey}.to_h
+      end
+    }
+  end
+
+  rule monkey
+    name ':' sp monkey_value  {
+      def monkey
+        [name.text_value, monkey_value]
+      end
+    }
+  end
+
+  rule monkey_value
+    operation {
+      def value
+        {type: :operation}.merge(operation)
+      end
+      }
+    / number {
+      def value
+        {type: :screaming, value: number.text_value.to_i}
+      end
+    }
+  end
+
+  rule operation
+    (lhs:name sp operator sp rhs:name) {
+      def operation
+        {operator: operator.text_value, lhs:lhs.text_value, rhs:rhs.text_value}
+      end
+    }
+  end
+
+  rule operator
+    [\+\-\*\/]
+  end
+
+  rule number
+    [0-9]+
+  end
+
+  rule name
+    ([a-zA-Z]+)
+  end
+
+  rule sp
+    [ \n\t]*
+  end
+end
